@@ -15,6 +15,7 @@
         "profile",
         "email"
       ],
+      "androidClientId": "443646227114-fpprh8snk2c4ocm1c19htsqhib2usqtj.apps.googleusercontent.com",
       "serverClientId": "443646227114-vbstcio2leo5l5ene86mtmd9cv6djdln.apps.googleusercontent.com",
       "forceCodeForRefreshToken": true
     }
