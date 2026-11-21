@@ -1,0 +1,18 @@
+/*
+ * Work around the Google Services Gradle plugin's transitive request for
+ * kotlin-stdlib-jdk8:1.9.0 while building the generated Capacitor Android
+ * project. Since Kotlin 1.8.0, the JDK 7/8 extension classes are merged into
+ * kotlin-stdlib, so redirecting the old module name preserves the classes
+ * while avoiding a separate jdk8 artifact lookup.
+ */
+gradle.beforeProject { project ->
+    project.buildscript.configurations.configureEach { classpathConfiguration ->
+        classpathConfiguration.resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'org.jetbrains.kotlin' &&
+                (details.requested.name == 'kotlin-stdlib-jdk8' ||
+                 details.requested.name == 'kotlin-stdlib-jdk7')) {
+                details.useTarget("org.jetbrains.kotlin:kotlin-stdlib:${details.requested.version}")
+            }
+        }
+    }
+}
