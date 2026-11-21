@@ -1,0 +1,21 @@
+{
+  "name": "mr-store-android",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MR Store Android application",
+  "scripts": {
+    "build": "npx cap sync android",
+    "android:add": "npx cap add android",
+    "android:open": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.1",
+    "@capacitor/app": "^6.0.2",
+    "@capacitor/core": "^6.2.1",
+    "@capacitor/splash-screen": "^6.0.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.1",
+    "@capacitor/assets": "^3.0.5"
+  }
+}
