@@ -2555,6 +2555,98 @@ body.mr-home-view #siteReviewsSection{display:none!important}
 }
 
 </style>
+
+<style id="mr-native-app-final">
+/* Hide the browser-like scroll indicator while keeping native scrolling enabled. */
+html, body, * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+*::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; }
+
+/* One true app navigation bar: no duplicate dock and no floating browser-style chrome. */
+.mr-bottom-nav { display: none !important; }
+@media (max-width: 760px) {
+  body { padding-bottom: calc(74px + env(safe-area-inset-bottom)) !important; }
+  .mr-glass-nav {
+    display: flex !important;
+    position: fixed !important;
+    z-index: 200 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 66px;
+    align-items: center;
+    justify-content: space-around;
+    gap: 2px;
+    padding: 7px 8px calc(7px + env(safe-area-inset-bottom)) !important;
+    border: 0 !important;
+    border-top: 1px solid rgba(110,130,190,.18) !important;
+    border-radius: 18px 18px 0 0 !important;
+    background: rgba(250,252,255,.97) !important;
+    box-shadow: 0 -5px 18px rgba(20,35,80,.08) !important;
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+  }
+  [data-theme="dark"] .mr-glass-nav {
+    background: rgba(12,19,35,.98) !important;
+    border-top-color: var(--line) !important;
+  }
+  .mr-nav-item { flex: 1; min-width: 0; min-height: 48px; }
+  .mr-nav-item.active { transform: none !important; }
+  .site-footer { display: none !important; }
+  /* Leave the bottom app navigation reachable while the cart is open. */
+  #cartOverlay { inset: 0 0 calc(66px + env(safe-area-inset-bottom)) 0 !important; }
+  #cartDrawer {
+    inset: 0 0 calc(66px + env(safe-area-inset-bottom)) 0 !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+  #cartDrawer.open { transform: translateX(0) !important; }
+}
+@media (min-width: 761px) {
+  .mr-glass-nav { display: none !important; }
+}
+
+/* The cart and checkout always sit above the navigation dock. */
+#cartOverlay { z-index: 179 !important; }
+#cartDrawer {
+  z-index: 180 !important;
+  overscroll-behavior: contain;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+#cartDrawer .drawer-body { min-height: 0; overscroll-behavior: contain; }
+#cartDrawer .drawer-foot {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  padding-bottom: calc(18px + env(safe-area-inset-bottom)) !important;
+  background: var(--paper);
+}
+#checkoutBtn { position: relative; z-index: 3; width: 100%; min-height: 52px; }
+
+/* Prevent long-press copy/selection and the blue tap highlight on app controls only. */
+button, a, .mr-glass-nav, .mr-glass-nav *, .icon-btn, .btn {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+.mr-glass-nav button:focus,
+.mr-glass-nav button:focus-visible,
+.mr-bottom-nav button:focus,
+.mr-bottom-nav button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+@media (hover: none) and (pointer: coarse) {
+  button:focus, a:focus { outline: none !important; }
+}
+</style>
+
 </head>
 <body>
 
@@ -2608,8 +2700,7 @@ body.mr-home-view #siteReviewsSection{display:none!important}
     <nav class="main-nav">
       <a href="#top">الرئيسية</a>
       <a href="#products">المنتجات</a>
-      <a href="#footer">تواصل معنا</a>
-      <span class="orders-nav-wrap"><a href="#" onclick="openMyOrdersModal(); return false;">الطلبات</a><span class="orders-nav-badge" id="ordersNavBadge"></span></span>
+        <span class="orders-nav-wrap"><a href="#" onclick="openMyOrdersModal(); return false;">الطلبات</a><span class="orders-nav-badge" id="ordersNavBadge"></span></span>
       <a href="#admin" class="admin-nav-link" id="adminNavLink">لوحة التحكم</a>
     </nav>
     <div class="header-actions">
@@ -2665,7 +2756,6 @@ body.mr-home-view #siteReviewsSection{display:none!important}
   <nav>
     <a href="#top">الرئيسية</a>
     <a href="#products">المنتجات</a>
-    <a href="#footer">تواصل معنا</a>
     <a href="#" onclick="openMyOrdersModal(); return false;">الطلبات</a>
     <a href="#admin" class="admin-nav-link" id="adminNavLinkMobile">لوحة التحكم</a>
   </nav>
@@ -2797,41 +2887,6 @@ body.mr-home-view #siteReviewsSection{display:none!important}
 
   </div>
 </section>
-
-<!-- ============ FOOTER ============ -->
-<footer class="site-footer" id="footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div>
-        <div class="footer-logo">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9h8v8l-9 9a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8z"/><circle cx="15.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"/></svg>
-          MR STORE
-        </div>
-        <p class="footer-about">وجهتك لأحدث صيحات الموضة الرجالي. جودة تستاهل، وأسعار في متناول الجميع.</p>
-      </div>
-      <div class="footer-col">
-        <h4>روابط سريعة</h4>
-        <ul>
-          <li><a href="#top">الرئيسية</a></li>
-          <li><a href="#products">المنتجات</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>تواصل معنا</h4>
-        <ul>
-          <li>هاتف: 01027883297</li>
-          <li>واتساب متاح يوميًا 10ص – 10م</li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>© 2026 MR Store — جميع الحقوق محفوظة</span>
-      <span>صُنع بعناية في مصر</span>
-    </div>
-  </div>
-</footer>
-
-
 
 <!-- ============ PRODUCT DETAIL PAGE ============ -->
 <div id="productDetailOverlay" onclick="closeProductDetail()"></div>
@@ -5273,11 +5328,25 @@ document.getElementById('cartItems').addEventListener('click', e=>{
 /* ============ CART DRAWER TOGGLE ============ */
 const cartDrawer = document.getElementById('cartDrawer');
 const cartOverlay = document.getElementById('cartOverlay');
-function openCart(){ cartDrawer.classList.add('open'); cartOverlay.classList.add('open'); }
-function closeCart(){ cartDrawer.classList.remove('open'); cartOverlay.classList.remove('open'); }
+function openCart(){
+  cartDrawer.classList.add('open');
+  cartOverlay.classList.add('open');
+  document.querySelectorAll('.mr-nav-item').forEach(b=>b.classList.toggle('active',b.dataset.nav==='cart'));
+}
+function closeCart(){
+  cartDrawer.classList.remove('open');
+  cartOverlay.classList.remove('open');
+  document.querySelectorAll('.mr-nav-item[data-nav="cart"]').forEach(b=>b.classList.remove('active'));
+}
 document.getElementById('cartToggle').addEventListener('click', openCart);
 document.getElementById('cartCloseBtn').addEventListener('click', closeCart);
 cartOverlay.addEventListener('click', closeCart);
+// Tapping any app control outside the cart dismisses it; interactions inside the cart remain untouched.
+document.addEventListener('click', e=>{
+  if(!cartDrawer.classList.contains('open')) return;
+  if(e.target.closest('#cartDrawer, #cartToggle, #mrGlassNav [data-nav="cart"]')) return;
+  closeCart();
+}, true);
 
 /* ============ MOBILE MENU ============ */
 const mobileMenu = document.getElementById('mobileMenu');
@@ -7004,6 +7073,8 @@ function _setupGoogleButtons() {
  }
  if(select){select.value=stored;applyLang(stored);select.addEventListener('change',()=>applyLang(select.value))}
  window.mrNavigate=function(target){
+   // Any destination other than the cart closes the cart first.
+   if(target!=='cart' && typeof closeCart==='function') closeCart();
    if(target!=='settings' && typeof closeSettingsModal==='function') closeSettingsModal();
    document.querySelectorAll('.mr-nav-item').forEach(b=>b.classList.toggle('active',b.dataset.nav===target));
    if(target==='home'){window.scrollTo({top:0,behavior:'smooth'});return}
@@ -7018,33 +7089,26 @@ function _setupGoogleButtons() {
    }
  };
  const nav=document.getElementById('mrGlassNav');
+ if(nav) nav.addEventListener('contextmenu',e=>e.preventDefault());
+ document.addEventListener('contextmenu',e=>{if(e.target.closest('button,a'))e.preventDefault()});
+ document.addEventListener('selectstart',e=>{if(e.target.closest('button,a,.mr-glass-nav'))e.preventDefault()});
  window.addEventListener('scroll',()=>{if(!nav)return;const products=document.getElementById('products');if(products&&window.scrollY>products.offsetTop-160){document.querySelectorAll('.mr-nav-item').forEach(b=>b.classList.toggle('active',b.dataset.nav==='products'))}else if(window.scrollY<250){document.querySelectorAll('.mr-nav-item').forEach(b=>b.classList.toggle('active',b.dataset.nav==='home'))}},{passive:true});
 })();
 </script>
 
 <script src="native-google-auth.js"></script>
 
-<nav class="mr-bottom-nav" aria-label="التنقل الرئيسي">
- <button type="button" data-mr-view="home" class="active"><span class="mr-nav-icon">⌂</span><span>الرئيسية</span></button>
- <button type="button" data-mr-view="products"><span class="mr-nav-icon">▦</span><span>التسوق</span></button>
- <button type="button" data-mr-view="cart"><span class="mr-nav-icon">🛒</span><span>العربة</span></button>
- <button type="button" data-mr-view="reviews"><span class="mr-nav-icon">★</span><span>التقييمات</span></button>
- <button type="button" data-mr-view="profile"><span class="mr-nav-icon">♙</span><span>بروفايل</span></button>
-</nav>
-
-
 <script>
-/* MR Store navigation, greeting and lighter interactions */
+/* Keep the personalized greeting in sync without registering a second navigation bar. */
 (function(){
  const $=s=>document.querySelector(s);
- function setActive(v){document.querySelectorAll('.mr-bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.mrView===v))}
  function setGreeting(){
    const user=typeof getUserData==='function'?getUserData():null;
    const title=$('#mrWelcomeTitle'),sub=$('#mrWelcomeSub');
    if(!title)return;
    if(user&&user.email){
      const key='mrstore_seen_'+String(user.email).toLowerCase();
-     let returning=localStorage.getItem(key)==='1';
+     const returning=localStorage.getItem(key)==='1';
      title.textContent=(returning?'مرحباً بعودتك':'مرحباً بك')+(user.name?'، '+user.name.split(' ')[0]:'');
      sub.textContent='سعداء بوجودك معانا — كمل تسوقك بسهولة';
      localStorage.setItem(key,'1');
@@ -7053,43 +7117,17 @@ function _setupGoogleButtons() {
      sub.textContent='اكتشف أحدث المنتجات وتسوق بسهولة';
    }
  }
- function view(v){
-   document.body.classList.remove('mr-home-view','mr-products-view','mr-reviews-view');
-   if(v==='home'){
-     document.body.classList.add('mr-home-view');setActive(v);
-     window.scrollTo(0,0);$('#mrWelcomeStrip').style.display='';
-   }else if(v==='products'){
-     document.body.classList.add('mr-products-view');setActive(v);
-     $('#mrWelcomeStrip').style.display='none';$('#products').scrollIntoView({block:'start'});
-   }else if(v==='cart'){
-     $('#mrWelcomeStrip').style.display='none';setActive(v);
-     if(typeof openCart==='function')openCart();
-   }else if(v==='reviews'){
-     document.body.classList.add('mr-reviews-view');setActive(v);
-     $('#mrWelcomeStrip').style.display='none';window.scrollTo(0,0);
-   }else if(v==='profile'){
-     $('#mrWelcomeStrip').style.display='none';setActive(v);
-     if(typeof getUserData==='function'&&!getUserData()){if(typeof openUserAuthModal==='function')openUserAuthModal();return}
-     if(typeof openSettingsModal==='function')openSettingsModal();
-   }
- }
  document.addEventListener('DOMContentLoaded',()=>{
-   document.querySelectorAll('.mr-bottom-nav button').forEach(b=>b.addEventListener('click',()=>view(b.dataset.mrView)));
-   const cartBtn=$('#cartToggle');
-   if(cartBtn)cartBtn.addEventListener('click',e=>{e.stopImmediatePropagation();view('cart')},true);
-   const profile=$('#userProfileWrap');
-   if(profile)profile.style.display='none';
    setGreeting();
    const original=window.updateUserUI;
    if(typeof original==='function'){
      window.updateUserUI=function(){original();setGreeting()};
    }
-   document.querySelectorAll('.main-nav a[href="#top"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();view('home')}));
-   document.querySelectorAll('.main-nav a[href="#products"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();view('products')}));
-   // Remove old hamburger/menu entry points
+   document.querySelectorAll('.main-nav a[href="#top"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();window.mrNavigate?.('home')}));
+   document.querySelectorAll('.main-nav a[href="#products"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();window.mrNavigate?.('products')}));
+   document.querySelectorAll('.main-nav a[href="#footer"]').forEach(a=>a.remove());
    const menu=$('#menuOpenBtn');if(menu)menu.remove();
  });
- window.mrStoreView=view;
 })();
 </script>
 
