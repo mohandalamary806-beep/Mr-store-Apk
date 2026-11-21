@@ -1,9 +1,3 @@
-# تحديث التصميم الزجاجي
-
-هذا الإصدار يتضمن إعادة تصميم واجهة MR Store بالكامل بطابع Glassmorphism، مع الحفاظ على تسجيل الدخول وقسم الأدمن. عند تحديث مستودع GitHub، ارفع المشروع كاملاً أو استبدل الملفات الموجودة في الأرشيف، خصوصاً `www/index.html` و`www/login.html` و`www/glass-redesign.css` و`capacitor.config.json`. خطوات البناء موجودة في [DESIGN_UPDATE_AR.md](DESIGN_UPDATE_AR.md).
-
----
-
 # إصلاح تسجيل الدخول بجوجل - MR Store
 
 استبدل الملفين في مستودع GitHub بنفس المسارات:

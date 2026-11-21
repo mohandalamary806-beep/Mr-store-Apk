@@ -1,0 +1,356 @@
+/* =====================================================================
+   MR STORE — AURORA GLASS THEME
+   ملف التصميم الجديد (زجاج شفاف + ألوان aurora). بيتحمّل بعد الـ CSS القديم
+   فبيغيّر الشكل كله من غير ما يلمس أي كود JavaScript (الأدمن/الدخول زي ما هم).
+   عايز تغيّر الألوان؟ عدّل المتغيرات اللي في أول الملف بس.
+   ===================================================================== */
+
+/* ---------- 1) الألوان (نهاري) ---------- */
+:root{
+  --g1:#7c5cff;            /* بنفسجي */
+  --g2:#22d3ee;            /* سماوي */
+  --g3:#ff6ba6;            /* وردي */
+  --grad:linear-gradient(135deg,var(--g1) 0%,#5b8cff 52%,var(--g2) 100%);
+  --grad-warm:linear-gradient(135deg,var(--g3),#ff9a6b);
+
+  --canvas:#eef0ff; --canvas-deep:#e3e7fb; --paper:#ffffff;
+  --ink:#1b1f3b; --ink-soft:#586089;
+  --denim:#6a4bff; --denim-deep:#4f35d6; --brass:#e8478b; --stamp:#ff4d6d;
+  --line:rgba(110,100,200,.2); --ok:#0fa573;
+
+  --glass:rgba(255,255,255,.46);
+  --glass-strong:rgba(255,255,255,.70);
+  --glass-line:rgba(255,255,255,.78);
+  --glass-shadow:0 10px 34px rgba(80,70,190,.17),inset 0 1px 0 rgba(255,255,255,.85);
+  --blur:blur(18px) saturate(170%);
+  --blur-lg:blur(28px) saturate(180%);
+
+  --radius-s:14px; --radius-m:20px; --radius-l:28px;
+  --shadow-s:0 4px 16px rgba(80,70,190,.12);
+  --shadow-m:0 12px 34px rgba(80,70,190,.18);
+  --shadow-l:0 28px 70px rgba(60,50,170,.28);
+  --ff-display:'Tajawal',sans-serif;
+
+  --aurora:
+    radial-gradient(55% 45% at 10% 6%,rgba(124,92,255,.42),transparent 62%),
+    radial-gradient(50% 42% at 94% 16%,rgba(34,211,238,.38),transparent 62%),
+    radial-gradient(55% 48% at 86% 96%,rgba(255,107,166,.34),transparent 62%),
+    radial-gradient(45% 40% at 4% 92%,rgba(255,196,120,.32),transparent 62%);
+}
+
+/* ---------- 2) الألوان (ليلي) ---------- */
+[data-theme="dark"]{
+  --canvas:#0a0d1f; --canvas-deep:#070916; --paper:#12162e;
+  --ink:#f2f3ff; --ink-soft:#a4a9cf;
+  --denim:#a99bff; --denim-deep:#7c5cff; --brass:#ff8fc0; --stamp:#ff6b86;
+  --line:rgba(255,255,255,.13); --ok:#34d399;
+
+  --glass:rgba(255,255,255,.075);
+  --glass-strong:rgba(18,22,48,.66);
+  --glass-line:rgba(255,255,255,.15);
+  --glass-shadow:0 12px 38px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.13);
+  --shadow-s:0 4px 18px rgba(0,0,0,.45);
+  --shadow-m:0 12px 38px rgba(0,0,0,.55);
+  --shadow-l:0 28px 70px rgba(0,0,0,.7);
+
+  --aurora:
+    radial-gradient(55% 45% at 10% 6%,rgba(124,92,255,.50),transparent 62%),
+    radial-gradient(50% 42% at 94% 16%,rgba(34,211,238,.30),transparent 62%),
+    radial-gradient(55% 48% at 86% 96%,rgba(255,107,166,.32),transparent 62%),
+    radial-gradient(45% 40% at 4% 92%,rgba(91,140,255,.30),transparent 62%);
+}
+
+/* ---------- 3) الخلفية ---------- */
+html{background:var(--canvas)}
+body{background:transparent!important;color:var(--ink);font-family:'Tajawal',sans-serif}
+body::before{content:"";position:fixed;inset:-6%;z-index:-1;pointer-events:none;background:var(--aurora);
+  animation:mrDrift 26s ease-in-out infinite alternate;will-change:transform}
+@keyframes mrDrift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(-2%,2%,0) scale(1.1)}}
+@media (prefers-reduced-motion:reduce){body::before{animation:none}}
+::selection{background:rgba(124,92,255,.35)}
+
+/* ---------- 4) أسطح الزجاج المشتركة ---------- */
+.site-header,.mobile-menu,.drawer,.modal,#productDetailModal,.confirm-box,.toast,
+.product-card-inner,.trust-item,.search-box,.price-filter-wrap,.hero-grid,.site-footer,
+.admin-topbar,.admin-login-card,.admin-stat-card,.order-card,.admin-table-wrapper,
+.sr-summary,.sr-form-wrap,.settings-user-card,.settings-row,.cart-item,.coupon-box,
+.checkout-summary,.pd-detail-item,.pd-review-card,.share-menu,.user-profile-wrap,
+.brand-inner,.form-content,.mr-glass-nav{
+  background:var(--glass)!important;
+  -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
+  border:1px solid var(--glass-line)!important;
+  box-shadow:var(--glass-shadow)!important;
+}
+.site-header,.mobile-menu,.drawer,.modal,#productDetailModal,.confirm-box,.toast,.admin-topbar,
+.admin-login-card,.form-content,.mr-glass-nav{background:var(--glass-strong)!important;
+  -webkit-backdrop-filter:var(--blur-lg);backdrop-filter:var(--blur-lg)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  :root{--glass:rgba(255,255,255,.82);--glass-strong:rgba(255,255,255,.95)}
+  [data-theme="dark"]{--glass:rgba(24,28,58,.88);--glass-strong:rgba(18,22,48,.96)}
+}
+
+/* ---------- 5) الهيدر والقائمة ---------- */
+.site-header{border-width:0 0 1px 0!important;border-radius:0 0 26px 26px;margin-inline:0}
+.header-inner{height:68px}
+.logo{font-family:'Tajawal',sans-serif;font-weight:900;font-size:1.35rem;letter-spacing:.08em;color:var(--ink)}
+.logo svg{color:var(--denim)}
+.main-nav a{padding:8px 16px;border-radius:999px;font-weight:700;color:var(--ink-soft);transition:all .2s}
+.main-nav a:hover{background:var(--glass);color:var(--ink)}
+.icon-btn{width:42px;height:42px;border-radius:50%!important;display:inline-grid;place-items:center;
+  background:var(--glass)!important;color:var(--ink);transition:transform .2s,background .2s}
+.icon-btn:hover{background:var(--glass-strong)!important;transform:translateY(-2px)}
+.cart-badge,.orders-badge,.orders-nav-badge{background:var(--grad-warm)!important;color:#fff!important;border:0!important;box-shadow:0 4px 12px rgba(255,107,166,.5)!important}
+.mobile-menu nav a{font-family:'Tajawal',sans-serif;font-weight:800;font-size:1.35rem;border-bottom:1px solid var(--line);padding:16px 6px}
+.user-profile-wrap{border-radius:999px;padding:4px 12px 4px 6px}
+
+/* ---------- 6) الهيرو (الصفحة الرئيسية) ---------- */
+.hero{padding:26px 0 18px}
+.hero-grid{border-radius:34px;padding:42px 44px;gap:36px;max-width:calc(var(--container) - 48px);margin-inline:auto;position:relative;overflow:hidden}
+.hero-grid::before{content:"";position:absolute;width:320px;height:320px;border-radius:50%;
+  inset-inline-end:-90px;top:-110px;background:radial-gradient(circle,rgba(34,211,238,.45),transparent 68%);pointer-events:none}
+.hero-title{font-family:'Tajawal',sans-serif;font-weight:900;font-size:clamp(2.2rem,6.4vw,4.2rem);line-height:1.18;max-width:none;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.hero-sub{color:var(--ink-soft);font-size:1.02rem;max-width:46ch}
+.eyebrow{font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:.14em;color:var(--denim);
+  background:var(--glass);border:1px solid var(--glass-line);padding:6px 14px;border-radius:999px;display:inline-flex}
+.eyebrow::before{display:none}
+.hero-fineprint{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--ink-soft);letter-spacing:.12em}
+.hero-stamp{width:230px;height:230px;border:1px solid var(--glass-line);background:var(--glass)!important;
+  -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);transform:rotate(-6deg);box-shadow:var(--glass-shadow),0 0 60px rgba(124,92,255,.35)}
+.hero-stamp::before{content:''!important;border-color:rgba(124,92,255,.35)!important}
+.hero-stamp-text{font-family:'Tajawal',sans-serif;font-weight:900;letter-spacing:.06em;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero-stamp-sub{color:var(--ink-soft)}
+.hero-stamp-tag{display:none}
+
+/* شريط المميزات */
+.trust-strip{background:transparent!important;border:0!important}
+.trust-grid{gap:14px;padding-block:14px}
+.trust-item{border-radius:20px;padding:16px 12px;font-weight:700;color:var(--ink)}
+.trust-item svg{color:var(--denim);width:26px;height:26px}
+
+/* ---------- 7) العناوين والفلاتر ---------- */
+.section{padding-block:36px}
+.section-title{font-family:'Tajawal',sans-serif;font-weight:900;font-size:clamp(1.7rem,4.5vw,2.5rem);margin-top:10px;color:var(--ink)}
+.products-toolbar{margin-bottom:26px;gap:14px}
+.filter-tabs{display:flex;gap:8px;flex-wrap:wrap;padding:6px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-line);
+  -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
+.filter-tab{border:0!important;background:transparent!important;color:var(--ink-soft);padding:9px 18px;font-weight:700;box-shadow:none!important;backdrop-filter:none!important}
+.filter-tab.active,.filter-tab:hover{background:var(--grad)!important;color:#fff!important;box-shadow:0 6px 18px rgba(124,92,255,.4)!important}
+.search-box,.price-filter-wrap{border-radius:999px;color:var(--ink-soft)}
+.search-box input{color:var(--ink);background:transparent!important;border:0!important;box-shadow:none!important}
+input[type=range]{accent-color:var(--g1)}
+
+/* ---------- 8) كروت المنتجات ---------- */
+.product-grid{gap:18px}
+.product-card-inner{clip-path:none!important;border-radius:26px!important;transition:transform .3s ease,box-shadow .3s ease}
+.product-card:hover .product-card-inner{transform:translateY(-6px);box-shadow:var(--shadow-m),0 0 0 1px var(--glass-line)!important}
+.tag-hole,.product-perf{display:none!important}
+.product-img{margin:8px;border-radius:20px;background:var(--glass)}
+.product-info{padding:6px 14px 14px}
+.product-name{font-weight:800;color:var(--ink)}
+.product-price,.pd-price,.sr-big-score,.admin-stat-value{font-family:'Tajawal',sans-serif;font-weight:900;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.product-old,.pd-old-price{color:var(--ink-soft)}
+.stamp-badge{top:12px;right:12px;left:auto;transform:none;border-radius:999px;padding:5px 12px;font-family:'Tajawal',sans-serif;font-weight:800;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5)}
+.stamp-new{background:linear-gradient(135deg,rgba(124,92,255,.9),rgba(34,211,238,.9))!important}
+.stamp-sale{background:var(--grad-warm)!important}
+.size-tag{border-radius:999px;background:var(--glass);border:1px solid var(--glass-line);color:var(--ink-soft)}
+.like-btn{border-radius:999px;background:var(--glass)!important;color:var(--ink-soft)}
+.like-btn.liked,.like-btn.liked svg{color:var(--g3)!important}
+
+/* ---------- 9) الأزرار (زجاج مموّه) ---------- */
+.btn,.btn-add,.pd-add-btn,.coupon-box button,.pd-share-btn,.pd-like-action,.pd-back-btn,.btn-share,
+.settings-action-btn,.settings-logout-btn,.acb,.order-actions button{
+  border-radius:16px!important;font-weight:800;-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
+  border:1px solid var(--glass-line)!important;transition:transform .2s,box-shadow .2s,background .2s}
+.btn::before,.btn-add::before,.order-actions button::before,.acb::before{display:none!important}
+.btn-primary,.btn-add,.pd-add-btn,#checkoutBtn{
+  background:linear-gradient(135deg,rgba(124,92,255,.92),rgba(91,140,255,.88) 55%,rgba(34,211,238,.88))!important;
+  color:#fff!important;border-color:rgba(255,255,255,.45)!important;
+  box-shadow:0 10px 26px rgba(124,92,255,.42),inset 0 1px 0 rgba(255,255,255,.55)!important}
+.btn-primary:hover,.btn-add:hover,.pd-add-btn:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.btn-primary:disabled,.btn-add:disabled,.pd-add-btn:disabled{filter:grayscale(.6) opacity(.6);box-shadow:none!important}
+.btn-outline,.pd-share-btn,.pd-like-action,.pd-back-btn,.btn-share,.coupon-box button{
+  background:var(--glass)!important;color:var(--ink)!important}
+.btn-outline:hover,.pd-share-btn:hover,.pd-like-action:hover,.btn-share:hover{background:var(--glass-strong)!important;transform:translateY(-2px)}
+.btn-danger,.btn-delete{background:linear-gradient(135deg,rgba(255,77,109,.9),rgba(255,107,166,.85))!important;color:#fff!important;border-color:rgba(255,255,255,.4)!important}
+.btn-wa{background:linear-gradient(135deg,rgba(37,211,102,.9),rgba(16,185,129,.85))!important;color:#fff!important}
+.btn-mark{background:rgba(16,185,129,.18)!important;color:var(--ok)!important}
+.btn-undo{background:rgba(255,170,60,.18)!important}
+.btn:active,.btn-add:active{transform:scale(.97)}
+
+/* ---------- 10) الحقول ---------- */
+.field label{font-weight:700;color:var(--ink-soft)}
+.field input,.field textarea,.field select,.coupon-box input,.settings-row input{
+  background:var(--glass)!important;border:1px solid var(--glass-line)!important;border-radius:16px!important;color:var(--ink)!important;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 1px 3px rgba(80,70,190,.08)}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--g1)!important;box-shadow:0 0 0 4px rgba(124,92,255,.22)!important}
+::placeholder{color:var(--ink-soft);opacity:.7}
+.field select option{background:var(--paper);color:var(--ink)}
+
+/* ---------- 11) النوافذ والسلة والتفاصيل ---------- */
+.overlay,#productDetailOverlay,.confirm-overlay{background:rgba(14,12,44,.38)!important;-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px)}
+.modal{border-radius:30px!important}
+.modal-head,.drawer-head,.pd-topbar{background:transparent!important;border-bottom:1px solid var(--line)!important}
+.modal-head h3,.drawer-head h3,.success-view h4,.confirm-title,.sr-form-title,.admin-title,.admin-login-card h2,.empty-state strong,.admin-empty strong{
+  font-family:'Tajawal',sans-serif;font-weight:900;color:var(--ink)}
+.drawer{border-radius:0 30px 30px 0}
+.drawer-foot{background:transparent!important;border-top:1px solid var(--line)!important}
+.drawer-subtotal span:last-child{font-weight:900;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.cart-item{border-radius:20px;padding:10px;margin-bottom:10px}
+.cart-item img{border-radius:14px}
+.qty-control button{background:var(--glass)!important;border-radius:10px;border:1px solid var(--glass-line)}
+#productDetailModal{border-radius:0}
+.pd-main-img,.pd-thumb{border-radius:22px;overflow:hidden}
+.pd-thumb.active{border-color:var(--g1)!important;box-shadow:0 0 0 3px rgba(124,92,255,.3)}
+.pd-name{font-family:'Tajawal',sans-serif;font-weight:900;color:var(--ink)}
+.pd-size-btn{background:var(--glass)!important;border:1px solid var(--glass-line)!important;border-radius:14px;color:var(--ink);backdrop-filter:blur(10px)}
+.pd-size-btn.active,.pd-size-btn:hover{background:var(--grad)!important;color:#fff!important;border-color:transparent!important}
+.pd-tab-btn{border-radius:999px!important;background:transparent!important;border:0!important;color:var(--ink-soft)}
+.pd-tab-btn.active{background:var(--grad)!important;color:#fff!important}
+.pd-badge,.pd-discount-badge{border-radius:999px}
+.share-menu{border-radius:18px}
+.confirm-box{border-radius:28px}
+.toast{border-radius:18px;color:var(--ink)!important}
+.success-view svg{color:var(--ok)}
+
+/* ---------- 12) التقييمات وآخر المشاهدات ---------- */
+.sr-summary,.sr-form-wrap{border-radius:26px}
+.sr-list>*,.rv-cards>*{background:var(--glass)!important;border:1px solid var(--glass-line)!important;border-radius:22px;
+  -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
+
+/* ---------- 13) الفوتر ---------- */
+.site-footer{margin:40px 14px 14px;border-radius:32px;color:var(--ink)!important}
+.site-footer *{color:inherit}
+.footer-about,.footer-col a,.footer-bottom{color:var(--ink-soft)!important}
+.footer-col h4{color:var(--ink)!important;font-weight:800}
+.footer-col a:hover{color:var(--denim)!important}
+.footer-bottom{border-top:1px solid var(--line)!important}
+.footer-social a{background:var(--glass)!important;border:1px solid var(--glass-line)!important;border-radius:14px;backdrop-filter:blur(10px)}
+.wa-float{background:linear-gradient(135deg,rgba(37,211,102,.95),rgba(16,185,129,.9))!important;box-shadow:0 10px 28px rgba(16,185,129,.5)!important}
+
+/* ---------- 14) لوحة الأدمن (نفس الوظائف، شكل جديد) ---------- */
+.admin-view,#loadingScreen{background:var(--aurora),var(--canvas)!important}
+.admin-topbar{border-width:0 0 1px 0!important;border-radius:0 0 24px 24px}
+.admin-stats{gap:14px}
+.admin-stat-card{border-radius:24px;position:relative;overflow:hidden}
+.admin-stat-card::after{content:"";position:absolute;inset-inline-end:-30px;top:-30px;width:100px;height:100px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,92,255,.35),transparent 70%)}
+.admin-stat-label{color:var(--ink-soft);font-weight:700}
+.admin-main-tabs{gap:8px;padding:6px;border-radius:22px;background:var(--glass);border:1px solid var(--glass-line);
+  -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);width:fit-content;max-width:100%;overflow-x:auto}
+.admin-main-tabs button{border:0!important;background:transparent!important;border-radius:16px!important;color:var(--ink-soft);font-weight:800;box-shadow:none!important}
+.admin-main-tabs button.active{background:var(--grad)!important;color:#fff!important;box-shadow:0 8px 20px rgba(124,92,255,.4)!important}
+.order-card,.admin-table-wrapper{border-radius:26px}
+.order-status{border-radius:999px;font-weight:800;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.order-items,.order-cust{background:transparent}
+.admin-table{color:var(--ink)}
+.admin-table th{background:var(--glass)!important;color:var(--ink-soft)}
+.admin-table th,.admin-table td{border-color:var(--line)!important}
+.acb{background:var(--glass)!important;color:var(--ink)}
+.admin-divider span{background:transparent;color:var(--ink-soft)}
+.admin-badge{background:var(--glass);border:1px solid var(--glass-line);border-radius:999px;color:var(--denim)}
+.admin-login-error.show{border-radius:14px}
+
+/* ---------- 15) شاشة التحميل ---------- */
+.loading-logo{font-family:'Tajawal',sans-serif!important;font-weight:900;font-size:2.6rem!important;letter-spacing:.12em;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.loading-bar{background:var(--glass)!important;border-radius:999px;overflow:hidden}
+.loading-bar-fill{background:var(--grad)!important;border-radius:999px}
+
+/* ---------- 16) شريط التنقل السفلي (موبايل) ---------- */
+.mr-glass-nav{border-radius:26px!important}
+.mr-nav-item{color:var(--ink-soft)!important;border-radius:18px!important;backdrop-filter:none!important}
+.mr-nav-item.active{background:var(--grad)!important;color:#fff!important;box-shadow:0 8px 20px rgba(124,92,255,.45)}
+
+/* ---------- 17) صفحة تسجيل الدخول (نفس المنطق، شكل زجاجي) ---------- */
+.split{background:transparent!important}
+.brand-panel,.form-panel{background:transparent!important}
+.brand-panel::before,.brand-panel::after{display:none!important}
+.brand-inner{border-radius:34px;padding:38px 32px;max-width:440px}
+.brand-logo{color:var(--ink)!important;font-family:'Tajawal',sans-serif;font-weight:900;letter-spacing:.1em}
+.brand-stamp{background:var(--glass)!important;border:1px solid var(--glass-line)!important;box-shadow:0 0 50px rgba(124,92,255,.4)!important;-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
+.brand-stamp::before{border-color:rgba(124,92,255,.35)!important}
+.stamp-big{font-family:'Tajawal',sans-serif!important;font-weight:900;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.stamp-small,.brand-sub,.perk{color:var(--ink-soft)!important}
+.brand-title,.panel-title{color:var(--ink)!important;font-family:'Tajawal',sans-serif!important;font-weight:900}
+.perk{background:var(--glass);border:1px solid var(--glass-line);border-radius:999px;padding:8px 16px}
+.perk-dot{background:var(--grad)!important}
+.form-content{border-radius:34px;padding:34px 28px;max-width:440px;margin-inline:auto;min-height:0!important;height:auto!important;align-self:center;width:100%}
+.panel-eyebrow{font-family:'Space Mono',monospace;color:var(--denim)}
+.panel-sub{color:var(--ink-soft)}
+.auth-tabs{background:var(--glass)!important;border:1px solid var(--glass-line)!important;border-radius:999px!important;padding:5px;
+  -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
+.auth-tab{border:0!important;border-radius:999px!important;color:var(--ink-soft)!important;background:transparent!important;font-weight:800}
+.auth-tab.active{background:var(--grad)!important;color:#fff!important;box-shadow:0 6px 18px rgba(124,92,255,.4)!important}
+.pass-toggle{background:transparent!important;border:0!important;box-shadow:none!important;color:var(--ink-soft)}
+.or-divider span{background:transparent!important;color:var(--ink-soft)}
+.or-divider::before,.or-divider::after{background:var(--line)!important}
+.mobile-header{background:var(--glass)!important;color:var(--ink)!important;border:1px solid var(--glass-line);border-radius:999px;
+  padding:8px 18px;-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
+.dark-toggle{background:var(--glass)!important;border:1px solid var(--glass-line)!important;border-radius:50%!important;color:var(--ink)!important;
+  -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
+.auth-msg.err{background:rgba(255,77,109,.14)!important;color:var(--stamp)!important;border:1px solid rgba(255,77,109,.35)!important;border-radius:14px}
+.auth-msg.ok{background:rgba(16,185,129,.14)!important;color:var(--ok)!important;border:1px solid rgba(16,185,129,.35)!important;border-radius:14px}
+.panel-footer a{color:var(--denim)!important;font-weight:800}
+
+/* زر Google الزجاجي (في الدخول والمتجر) */
+.login-google-glass,.mr-google-glass{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;
+  background:var(--glass)!important;color:var(--ink)!important;border:1px solid var(--glass-line)!important;border-radius:18px!important;font-weight:800;
+  -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);box-shadow:var(--glass-shadow)!important}
+.g-mark,.mr-google-mark{background:#fff;color:#4285f4;width:28px;height:28px;border-radius:50%;display:inline-grid;place-items:center;font:900 17px Arial;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+
+/* ---------- 18) موبايل ---------- */
+@media (max-width:760px){
+  .header-inner{height:60px;gap:6px;padding-inline:12px}
+  .header-actions{gap:5px!important}
+  .icon-btn{width:38px;height:38px}
+  .icon-btn svg{width:19px;height:19px}
+  .logo{font-size:1.02rem;letter-spacing:.05em;gap:6px}
+  .logo svg{width:22px;height:22px}
+  .user-auth-wrap #userLoginBtn{padding:7px 12px!important;font-size:.72rem!important;border-radius:999px!important;white-space:nowrap}
+  .site-header{border-radius:0 0 22px 22px}
+  .hero{padding:16px 0 8px}
+  .hero-grid{flex-direction:column;padding:28px 22px;gap:18px;border-radius:30px;margin-inline:12px;max-width:none}
+  .hero-stamp-wrap{width:170px;height:170px}
+  .hero-stamp{width:165px;height:165px}
+  .trust-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .product-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .product-card-inner{border-radius:22px!important}
+  .product-img{margin:6px;border-radius:17px}
+  .product-info{padding:4px 10px 12px}
+  .admin-stats{grid-template-columns:repeat(2,1fr);gap:10px}
+  .form-content{padding:26px 20px;border-radius:30px;margin-inline:12px}
+  .site-footer{margin:28px 10px 10px;border-radius:28px}
+  .toast{left:14px;right:14px;bottom:96px}
+}
+
+/* ---------- 19) تنظيف بقايا الذهبي القديم في الوضع الليلي ---------- */
+[data-theme="dark"] .hero-title{background:var(--grad)!important;background-size:auto!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important}
+[data-theme="dark"] .hero-stamp{background:var(--glass)!important;border-color:var(--glass-line)!important}
+[data-theme="dark"] .filter-tab.active,[data-theme="dark"] .filter-tab:hover{background:var(--grad)!important;color:#fff!important;border-color:transparent!important}
+[data-theme="dark"] .rv-card-price,[data-theme="dark"] .price-filter-val,[data-theme="dark"] .timeline-label.active,
+[data-theme="dark"] .settings-action-btn,[data-theme="dark"] .user-profile-wrap,[data-theme="dark"] .mobile-menu nav a:hover,
+[data-theme="dark"] .acb-edit,[data-theme="dark"] .sr-action-edit:hover{color:var(--denim)!important}
+[data-theme="dark"] .timeline-dot.active,[data-theme="dark"] .sr-owner-tag,[data-theme="dark"] .av-owner-badge,
+[data-theme="dark"] .size-tag:hover,[data-theme="dark"] .acb-edit:hover,[data-theme="dark"] .acb-up:hover,[data-theme="dark"] .acb-down:hover{
+  background:var(--grad)!important;color:#fff!important;border-color:transparent!important}
+[data-theme="dark"] .frame-option.selected,[data-theme="dark"] .rv-card:hover,[data-theme="dark"] .order-card:hover,
+[data-theme="dark"] .search-box:focus-within,[data-theme="dark"] .price-filter-wrap:hover,
+[data-theme="dark"] .color-swatch-label input:checked + .color-swatch{border-color:var(--g1)!important;box-shadow:0 8px 28px rgba(124,92,255,.25)!important}
+[data-theme="dark"] .pd-thumb.active{box-shadow:0 0 0 3px rgba(124,92,255,.4)}
+[data-theme="dark"] .main-nav a::after{background:var(--grad)}
+[data-theme="dark"] :focus-visible{outline-color:var(--g1)}
+[data-theme="dark"] .price-filter-wrap input[type="range"]{accent-color:var(--g1)}
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover{background:var(--g1)}
+[data-theme="dark"] .share-menu-item:hover,[data-theme="dark"] .pd-back-btn:hover{background:var(--glass-strong);color:var(--denim)}
+[data-theme="dark"] .skeleton,[data-theme="dark"] .skeleton-img{background:linear-gradient(90deg,var(--glass),rgba(255,255,255,.14),var(--glass))!important;background-size:200% 100%!important}
+#flashSaleBanner,[data-theme="dark"] #flashSaleBanner{background:linear-gradient(135deg,#ff4d6d,#7c5cff)!important;color:#fff;
+  -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
+:focus-visible{outline:3px solid rgba(124,92,255,.55);outline-offset:3px;border-radius:10px}
+
+/* في وضع الأدمن: اخفي أقسام المتجر (التقييمات/آخر المشاهدات) اللي كانت بتظهر فوق لوحة التحكم */
+body:has(#adminView.open) #siteReviewsSection,
+body:has(#adminView.open) #recentlyViewedSection{display:none!important}
