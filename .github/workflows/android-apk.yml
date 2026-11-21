@@ -1,4 +1,3 @@
-
 name: Build MR Store APK
 
 on:
@@ -21,6 +20,12 @@ jobs:
         with:
           node-version: 20
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
       - name: Install dependencies
         run: npm install
 
@@ -36,23 +41,42 @@ jobs:
       - name: Sync web app
         run: npx cap sync android
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      # Cache a dedicated debug keystore so repeated test builds keep
+      # the same SHA-1. For production, use a private release keystore.
+      - name: Restore Android debug signing key
+        uses: actions/cache@v4
         with:
-          distribution: temurin
-          java-version: '17'
+          path: ~/.config/.android/debug.keystore
+          key: mr-store-debug-keystore-v1
 
-      - name: Get Android SHA-1
-        working-directory: android
+      - name: Create Android debug signing key when missing
+        shell: bash
         run: |
-          chmod +x gradlew
-          ./gradlew :app:signingReport
+          KEYSTORE="$HOME/.config/.android/debug.keystore"
+          mkdir -p "$(dirname "$KEYSTORE")"
+          if [ ! -f "$KEYSTORE" ]; then
+            keytool -genkeypair -v \
+              -keystore "$KEYSTORE" \
+              -storepass android \
+              -alias AndroidDebugKey \
+              -keypass android \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "C=US, O=Android, CN=Android Debug"
+          fi
 
       - name: Build debug APK
         working-directory: android
         run: |
           chmod +x gradlew
           ./gradlew assembleDebug
+
+      - name: Print SHA-1 from the built APK
+        run: |
+          echo "SHA-1 and SHA-256 for the exact APK being uploaded:"
+          keytool -printcert -jarfile android/app/build/outputs/apk/debug/app-debug.apk |
+            grep -E 'SHA1:|SHA256:'
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
