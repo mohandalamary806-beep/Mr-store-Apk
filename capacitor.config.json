@@ -6,7 +6,7 @@
   "plugins": {
     "SplashScreen": {
       "launchShowDuration": 1800,
-      "backgroundColor": "#0D1730",
+      "backgroundColor": "#101b3b",
       "showSpinner": false,
       "androidScaleType": "CENTER_CROP"
     },
