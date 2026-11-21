@@ -1089,12 +1089,8 @@ h1,h2,h3,h4{font-weight:inherit;}
 [data-theme="dark"] .acb-delete:hover{background:linear-gradient(150deg,#E05C4A 0%,#B03020 100%);box-shadow:0 4px 14px rgba(224,92,74,.32);}
 
 /* ============ LOADING SCREEN ============ */
-#loadingScreen{
-  position:fixed;inset:0;background:var(--canvas);z-index:9999;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
-  transition:opacity .5s ease, visibility .5s ease;
-}
-#loadingScreen.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+#loadingScreen{display:none!important;visibility:hidden!important;pointer-events:none!important;}
+#loadingScreen.hidden{display:none!important;}
 .loading-logo{font-family:var(--ff-mono);font-size:1.8rem;font-weight:700;color:var(--denim);letter-spacing:.1em;}
 .loading-bar{width:160px;height:3px;background:var(--line);border-radius:99px;overflow:hidden;}
 .loading-bar-fill{height:100%;width:0%;background:var(--denim);border-radius:99px;animation:loadBar 1.4s ease forwards;}
@@ -2647,6 +2643,15 @@ button, a, .mr-glass-nav, .mr-glass-nav *, .icon-btn, .btn {
 }
 </style>
 
+<style id="mr-hide-webview-scroll-indicator">
+  html, body { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+  html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar {
+    width: 0 !important; height: 0 !important; display: none !important;
+    background: transparent !important;
+  }
+  * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+  body { overscroll-behavior-y: none; }
+</style>
 </head>
 <body>
 
@@ -2665,12 +2670,6 @@ button, a, .mr-glass-nav, .mr-glass-nav *, .icon-btn, .btn {
     <span style="font-size:.8rem;opacity:.9;">اشتري دلوقتي قبل ما ينتهي!</span>
   </div>
   <button class="flash-close" onclick="dismissFlashBanner()" aria-label="إغلاق">×</button>
-</div>
-
-<!-- ============ LOADING SCREEN ============ -->
-<div id="loadingScreen" aria-hidden="true">
-  <div class="loading-logo">MR STORE</div>
-  <div class="loading-bar"><div class="loading-bar-fill"></div></div>
 </div>
 
 <!-- ============ IMAGE ZOOM MODAL ============ -->
@@ -6564,9 +6563,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const waFloatEl = document.getElementById('waFloat');
   if (waFloatEl) waFloatEl.href = `https://wa.me/2${STORE_WHATSAPP_NUMBER}`;
 
-  /* 5. إخفاء loading فوراً */
-  const ls = document.getElementById('loadingScreen');
-  if (ls) ls.classList.add('hidden');
+  /* 5. لا توجد شاشة تحميل HTML؛ واجهة المتجر تظهر مباشرة. */
 
   /* 6. تحميل الكارت من Firebase لو في يوزر */
   const currentUser = getUserData();
