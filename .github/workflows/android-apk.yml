@@ -35,9 +35,6 @@ jobs:
       - name: Add Android platform
         run: npx cap add android
 
-      - name: Disable native Android WebView scroll indicators
-        run: python .github/scripts/disable-webview-scrollbars.py
-
       - name: Generate Android icons and splash assets
         run: npx capacitor-assets generate --android
 
