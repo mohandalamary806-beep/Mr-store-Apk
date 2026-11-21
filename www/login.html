@@ -367,6 +367,34 @@ a{color:inherit;text-decoration:none;}
   .form-panel-inner{padding:56px 64px;max-width:560px;}
   .panel-title{font-size:3.4rem;}
 }
+
+/* MR Store mobile app login polish */
+.login-google-glass{width:100%;max-width:100%;min-height:50px;margin:4px 0 0;padding:10px 14px;border-radius:15px;border:1px solid rgba(255,255,255,.55);background:linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.10));color:var(--ink);display:flex;align-items:center;justify-content:center;gap:11px;font-weight:800;box-shadow:0 8px 24px rgba(15,25,45,.10),inset 0 1px 0 rgba(255,255,255,.65);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%)}
+[data-theme="dark"] .login-google-glass{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.16)}
+.g-mark{width:26px;height:26px;border-radius:50%;background:#fff;color:#4285f4;display:grid;place-items:center;font:900 17px Arial}
+button,.btn,.auth-tab,.pass-toggle,.dark-toggle{-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+button:not(.login-google-glass){box-shadow:0 4px 16px rgba(15,25,45,.07)}
+@media(max-width:760px){
+ .split{display:block;min-height:100dvh;background:var(--canvas);padding:0 0 env(safe-area-inset-bottom)}
+ .brand-panel{display:none}
+ .form-panel{min-height:100dvh;max-height:none;overflow:visible;background:transparent;justify-content:center;padding:18px 0}
+ .form-panel-inner{width:100%;max-width:440px;padding:12px 18px;margin:auto;justify-content:center}
+ .form-content{width:100%;padding:22px 18px 24px;border-radius:25px;background:rgba(255,255,255,.60);border:1px solid rgba(255,255,255,.72);box-shadow:0 16px 48px rgba(22,34,58,.12),inset 0 1px 0 rgba(255,255,255,.85);backdrop-filter:blur(24px) saturate(170%);-webkit-backdrop-filter:blur(24px) saturate(170%)}
+ [data-theme="dark"] .form-content{background:rgba(20,23,32,.78);border-color:rgba(255,255,255,.12)}
+ .panel-title{font-size:2.25rem;margin-bottom:5px}
+ .panel-sub{font-size:.79rem;margin-bottom:16px}
+ .auth-tabs{margin-bottom:16px}
+ .auth-tab{padding:9px 8px;font-size:.8rem}
+ .field{margin-bottom:12px}
+ .field input{min-height:44px;padding:10px 12px}
+ .btn{min-height:46px;padding:11px 14px}
+ .or-divider{margin:13px 0;font-size:.6rem}
+ .panel-footer{margin-top:14px;font-size:.75rem}
+ .mobile-header{display:flex;align-items:center;justify-content:center;gap:9px;font:700 1rem var(--ff-mono);color:var(--denim);margin:4px auto 14px}
+ .mobile-header svg{width:23px;height:23px}
+ .dark-toggle{top:12px;right:12px;width:35px;height:35px;background:rgba(255,255,255,.35);backdrop-filter:blur(18px)}
+}
+@media(max-height:700px) and (max-width:760px){.form-panel{padding:8px 0}.form-content{padding:16px}.panel-title{font-size:1.9rem}.panel-sub{margin-bottom:10px}.auth-tabs{margin-bottom:10px}.field{margin-bottom:8px}}
 </style>
 </head>
 <body>
@@ -445,7 +473,7 @@ a{color:inherit;text-decoration:none;}
           <button type="submit" class="btn btn-primary" id="loginBtn">دخول للمتجر</button>
         </form>
         <div class="or-divider"><span>أو سجّل بـ</span></div>
-        <div class="google-wrap" id="googleLoginBtn"></div>
+        <button type="button" class="login-google-glass" onclick="mrLoginWithGoogle()"><span class="g-mark">G</span> المتابعة باستخدام Google</button><div class="google-wrap" id="googleLoginBtn" style="display:none"></div>
       </div>
 
       <!-- ===== SIGNUP PANEL ===== -->
@@ -482,7 +510,7 @@ a{color:inherit;text-decoration:none;}
           <button type="submit" class="btn btn-primary" id="signupBtn">إنشاء الحساب</button>
         </form>
         <div class="or-divider"><span>أو سجّل بـ</span></div>
-        <div class="google-wrap" id="googleSignupBtn"></div>
+        <button type="button" class="login-google-glass" onclick="mrLoginWithGoogle()"><span class="g-mark">G</span> المتابعة باستخدام Google</button><div class="google-wrap" id="googleSignupBtn" style="display:none"></div>
       </div>
 
       <div class="panel-footer" id="panelFooter">
@@ -680,6 +708,20 @@ async function handleSignup(e){
 }
 
 /* ============ GOOGLE SIGN-IN ============ */
+window.mrLoginWithGoogle=async function(){
+  try{
+    if(window.Capacitor?.isNativePlatform?.()){
+      if(!window.MRGoogleAuth) throw new Error('Google native plugin is not ready');
+      const result=await window.MRGoogleAuth.signIn();
+      const token=result?.authentication?.idToken || result?.idToken || result?.id_token;
+      if(!token) throw new Error('Missing Google ID token');
+      handleCredentialResponse({credential:token});
+      return;
+    }
+    if(window.google?.accounts?.id){google.accounts.id.prompt();return;}
+    showMsg('loginErr','تسجيل الدخول بجوجل غير متاح حالياً.');
+  }catch(err){console.error('Google login failed:',err);showMsg('loginErr','تعذر تسجيل الدخول بجوجل. تأكد من إعداد OAuth للتطبيق.');}
+};
 function handleCredentialResponse(response){
   try{
     const payload = JSON.parse(atob(response.credential.split('.')[1]));
@@ -722,6 +764,7 @@ function handleCredentialResponse(response){
 }
 
 window.onGoogleLibraryLoad=function(){
+  if(window.Capacitor?.isNativePlatform?.()) return;
   google.accounts.id.initialize({
     client_id:GOOGLE_CLIENT_ID,
     callback:handleCredentialResponse,
@@ -748,5 +791,6 @@ const _t=setInterval(()=>{
   }catch(e){}
 })();
 </script>
+<script src="native-google-auth.js"></script>
 </body>
 </html>

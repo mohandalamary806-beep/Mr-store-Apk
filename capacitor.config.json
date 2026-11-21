@@ -9,6 +9,14 @@
       "backgroundColor": "#0D1730",
       "showSpinner": false,
       "androidScaleType": "CENTER_CROP"
+    },
+    "GoogleAuth": {
+      "scopes": [
+        "profile",
+        "email"
+      ],
+      "serverClientId": "443646227114-vbstcio2leo5l5ene86mtmd9cv6djdln.apps.googleusercontent.com",
+      "forceCodeForRefreshToken": true
     }
   }
 }

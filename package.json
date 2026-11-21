@@ -4,18 +4,21 @@
   "private": true,
   "description": "MR Store Android application",
   "scripts": {
-    "build": "npx cap sync android",
+    "build": "npm run build:web && npx cap sync android",
     "android:add": "npx cap add android",
-    "android:open": "npx cap open android"
+    "android:open": "npx cap open android",
+    "build:web": "esbuild native-google-auth.js --bundle --format=iife --global-name=MRGoogleAuthBundle --outfile=www/native-google-auth.js"
   },
   "dependencies": {
     "@capacitor/android": "^6.2.1",
     "@capacitor/app": "^6.0.2",
     "@capacitor/core": "^6.2.1",
-    "@capacitor/splash-screen": "^6.0.2"
+    "@capacitor/splash-screen": "^6.0.2",
+    "@codetrix-studio/capacitor-google-auth": "^3.4.0"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.2.1",
-    "@capacitor/assets": "^3.0.5"
+    "@capacitor/assets": "^3.0.5",
+    "esbuild": "^0.24.2"
   }
 }

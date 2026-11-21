@@ -2698,11 +2698,7 @@ html { scroll-behavior: smooth; }
   </div>
 </footer>
 
-<!-- ============ WHATSAPP FLOAT ============ -->
-<a href="#" id="waFloat" class="wa-float" target="_blank" rel="noopener" aria-label="تواصل عبر واتساب">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-8.9 8.49 8.6 8.6 0 0 1-3.8-.9L3 20l1-4.8A8.5 8.5 0 1 1 21 11.5z"/></svg>
-  <span class="wa-tooltip">تواصل معنا على واتساب</span>
-</a>
+
 
 <!-- ============ PRODUCT DETAIL PAGE ============ -->
 <div id="productDetailOverlay" onclick="closeProductDetail()"></div>
@@ -3147,7 +3143,11 @@ html { scroll-behavior: smooth; }
   </div>
   <div class="modal-body" style="text-align:center; padding: 32px 20px;">
     <p style="margin-bottom: 22px; color: var(--ink-soft); font-size: 0.95rem;">سجّل دخولك بضغطة واحدة باستخدام حساب جوجل لتجربة تسوق أفضل وحفظ منتجاتك المفضلة والمشاركة في التقييمات.</p>
-    <div class="google-signin-wrap" id="userGoogleSignInBtn" style="display:flex; justify-content:center;"></div>
+    <button class="mr-google-glass" type="button" id="mrNativeGoogleBtn" onclick="mrStartGoogleLogin()">
+      <span class="mr-google-mark">G</span><span>المتابعة باستخدام Google</span>
+    </button>
+    <div class="google-signin-wrap" id="userGoogleSignInBtn" style="display:none; justify-content:center;"></div>
+    <p class="mr-google-hint">تسجيل دخول آمن بحساب Google الخاص بك</p>
   </div>
 </div>
 
@@ -3227,6 +3227,16 @@ html { scroll-behavior: smooth; }
     <div class="settings-section">
       <div class="settings-label" id="mrAppearanceHeading">المظهر</div>
       <button class="settings-action-btn" type="button" onclick="toggleDarkMode()" id="mrThemeButton">تبديل الوضع الليلي</button>
+    </div>
+
+    <div class="settings-divider"></div>
+    <div class="settings-section" id="settingsSupportSection">
+      <div class="settings-label">تواصل الدعم</div>
+      <a class="settings-action-btn mr-support-link" href="https://wa.me/201027883297" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20l1.1-4.7a8.5 8.5 0 1 1 16.4-3.8Z"/><path d="M8.5 8.3c.3-.6.6-.6.9-.6h.5c.2 0 .4.1.5.4l.7 1.7c.1.2.1.4-.1.6l-.6.7c-.2.2-.2.4-.1.6.5.9 1.2 1.6 2.1 2.1.2.1.4.1.6-.1l.8-.9c.2-.2.4-.2.6-.1l1.6.8c.3.1.4.3.4.5 0 .3-.2 1.1-.7 1.5-.5.5-1.2.7-1.9.6-1.1-.1-2.5-.8-3.9-2.1-1.3-1.2-2.1-2.8-2.3-3.8-.2-.8.1-1.5.5-1.9Z"/></svg>
+        <span>تواصل معنا عبر واتساب</span>
+      </a>
+      <p class="mr-support-note">فريق الدعم متاح لمساعدتك في الطلبات والاستفسارات</p>
     </div>
 
     <!-- تسجيل الخروج -->
@@ -6743,6 +6753,28 @@ function applyPriceFilter(val) {
 /* ============ FREE SHIPPING BAR ============ */
 function updateFreeShippingBar() { /* disabled */ }
 
+/* Native Google Sign-In: يفتح نافذة Google الأصلية خارج WebView */
+window.mrStartGoogleLogin = async function(){
+  const btn=document.getElementById('mrNativeGoogleBtn');
+  if(btn){btn.disabled=true;btn.classList.add('is-loading');}
+  try{
+    if(window.Capacitor?.isNativePlatform?.()){
+      const auth=window.MRGoogleAuth;
+      if(!auth) throw new Error('Google native plugin is not ready');
+      const result=await auth.signIn();
+      const token=result?.authentication?.idToken || result?.idToken || result?.id_token;
+      if(!token) throw new Error('Google did not return an ID token');
+      await handleCredentialResponse({credential:token});
+      return;
+    }
+    if(window.google?.accounts?.id){google.accounts.id.prompt();return;}
+    throw new Error('Google Sign-In is unavailable');
+  }catch(err){
+    console.error('MR Store Google login:',err);
+    if(typeof showToast==='function') showToast('تعذر تسجيل الدخول بجوجل. تأكد من إعداد OAuth للتطبيق.');
+  }finally{if(btn){btn.disabled=false;btn.classList.remove('is-loading');}}
+};
+
 /* Google GSI — بنستخدم onGoogleLibraryLoad callback الرسمي
    + retry loop كـ fallback لو الـ callback ما اشتغلش */
 function initGoogleSignIn() {
@@ -6773,6 +6805,7 @@ function initGoogleSignIn() {
 
 function _setupGoogleButtons() {
   try {
+    if(window.Capacitor?.isNativePlatform?.()) return;
     google.accounts.id.initialize({
       client_id: GOOGLE_CLIENT_ID,
       callback: handleCredentialResponse,
@@ -6853,6 +6886,7 @@ function _setupGoogleButtons() {
  }
  if(select){select.value=stored;applyLang(stored);select.addEventListener('change',()=>applyLang(select.value))}
  window.mrNavigate=function(target){
+   if(target!=='settings' && typeof closeSettingsModal==='function') closeSettingsModal();
    document.querySelectorAll('.mr-nav-item').forEach(b=>b.classList.toggle('active',b.dataset.nav===target));
    if(target==='home'){window.scrollTo({top:0,behavior:'smooth'});return}
    if(target==='products'){document.getElementById('products')?.scrollIntoView({behavior:'smooth'});return}
@@ -6870,5 +6904,45 @@ function _setupGoogleButtons() {
 })();
 </script>
 
+<script src="native-google-auth.js"></script>
 </body>
 </html>
+<style id="mr-native-polish-v2">
+:root{--mr-glass:rgba(255,255,255,.16);--mr-glass-line:rgba(255,255,255,.28)}
+[data-theme="dark"]{--mr-glass:rgba(255,255,255,.075);--mr-glass-line:rgba(255,255,255,.13)}
+/* Glass treatment for controls throughout the store */
+button,.btn,.settings-action-btn,.settings-logout-btn,.icon-btn,.filter-tab,.pd-tab-btn,.pd-back-btn,.pd-add-btn,.pd-share-btn,.pd-like-action,.mr-nav-item{
+  -webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%);
+}
+button:not(.mr-nav-item),.btn,.settings-action-btn,.settings-logout-btn,.icon-btn,.filter-tab,.pd-back-btn,.pd-add-btn,.pd-share-btn,.pd-like-action{
+  border:1px solid var(--mr-glass-line)!important;box-shadow:0 5px 18px rgba(18,28,48,.08),inset 0 1px 0 rgba(255,255,255,.24);
+}
+button:active,.btn:active{transform:scale(.975)}
+.settings-action-btn,.settings-row,.settings-user-card{border-radius:14px}
+.settings-action-btn{background:var(--mr-glass)!important;color:var(--ink);padding:11px 14px;display:inline-flex;align-items:center;gap:10px;text-decoration:none}
+.mr-support-link{width:100%;justify-content:center;color:#168a55!important}
+.mr-support-link svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.mr-support-note{font-size:.73rem;color:var(--ink-soft);margin-top:8px;text-align:center}
+.mr-google-glass{width:100%;max-width:340px;min-height:52px;margin:8px auto 0;padding:10px 16px;border-radius:16px!important;border:1px solid rgba(255,255,255,.38)!important;background:linear-gradient(135deg,rgba(255,255,255,.32),rgba(255,255,255,.10))!important;color:var(--ink);display:flex;align-items:center;justify-content:center;gap:12px;font-weight:800;box-shadow:0 8px 28px rgba(15,25,45,.12),inset 0 1px 0 rgba(255,255,255,.55)!important;backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%)}
+[data-theme="dark"] .mr-google-glass{background:rgba(255,255,255,.08)!important;color:#fff}
+.mr-google-mark{width:27px;height:27px;border-radius:50%;background:#fff;color:#4285f4;display:grid;place-items:center;font:900 18px Arial;box-shadow:0 2px 8px #0002}
+.mr-google-hint{font-size:.72rem;color:var(--ink-soft);margin-top:10px;text-align:center}
+.mr-google-glass:disabled{opacity:.65}
+/* Smaller, app-like bottom dock */
+@media(max-width:760px){
+ body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+ .mr-glass-nav{left:50%;right:auto;transform:translateX(-50%);width:min(390px,calc(100vw - 34px));bottom:calc(8px + env(safe-area-inset-bottom));padding:6px 8px;border-radius:20px;gap:0;background:rgba(245,247,250,.68);border-color:rgba(255,255,255,.68);box-shadow:0 8px 28px rgba(10,20,40,.17),inset 0 1px 0 rgba(255,255,255,.8)}
+ [data-theme="dark"] .mr-glass-nav{background:rgba(17,20,29,.72);border-color:rgba(255,255,255,.15)}
+ .mr-nav-item{gap:2px;padding:4px 1px;font-size:.59rem;border-radius:13px}
+ .mr-nav-item svg{width:19px;height:19px}
+ .mr-nav-item.active{transform:translateY(-1px)}
+ .site-footer{padding-bottom:88px}
+ .modal{width:min(440px,calc(100vw - 28px));max-height:min(82dvh,720px);border-radius:22px}
+ .modal-head{padding:14px 17px}
+ .modal-body{padding:16px!important}
+ .settings-section{margin-bottom:4px}
+ .settings-label{font-size:.78rem}
+ .settings-user-card{padding:10px}
+}
+@media(max-width:380px){.mr-nav-item span{font-size:.55rem}.mr-glass-nav{width:calc(100vw - 24px)}}
+</style>
