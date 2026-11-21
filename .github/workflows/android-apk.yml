@@ -70,7 +70,7 @@ jobs:
         working-directory: android
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew -I ../.github/gradle/kotlin-stdlib-compat.init.gradle assembleDebug
 
       - name: Print SHA-1 from the built APK
         run: |
