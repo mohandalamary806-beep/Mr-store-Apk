@@ -7192,48 +7192,56 @@ function _setupGoogleButtons() {
   }
 </style>
 <style id="mr-fullscreen-edit-forms-fix">
-  /* Keep the original modal open/close behavior; only size the three forms. */
+  /* These three forms occupy the complete usable screen, ending exactly at the bottom navigation. */
+  :root{--mr-nav-clearance:max(72px, calc(62px + env(safe-area-inset-bottom)))}
   #editProductModal,#editBannerModal,#checkoutModal{
     position:fixed!important;
-    top:0!important;left:0!important;right:0!important;
-    bottom:var(--mr-nav-clearance)!important;
-    width:100%!important;max-width:none!important;
-    height:auto!important;max-height:none!important;
-    margin:0!important;border-radius:0!important;
-    z-index:147!important;overflow:hidden!important;
+    top:0!important;left:0!important;right:0!important;bottom:auto!important;
+    width:100vw!important;max-width:none!important;
+    height:calc(100vh - var(--mr-nav-clearance))!important;
+    height:calc(100dvh - var(--mr-nav-clearance))!important;
+    min-height:0!important;max-height:none!important;
+    box-sizing:border-box!important;margin:0!important;padding:0!important;
+    display:flex!important;flex-direction:column!important;
+    align-items:stretch!important;justify-content:flex-start!important;
+    z-index:480!important;overflow:hidden!important;
     transform:none!important;
-    -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
-    filter:none!important;
+    opacity:0!important;pointer-events:none!important;
+    background:var(--paper)!important;background-color:var(--paper)!important;
+    border:0!important;border-radius:0!important;box-shadow:none!important;
+    -webkit-backdrop-filter:none!important;backdrop-filter:none!important;filter:none!important;
+    transition:opacity .2s ease!important;
   }
   #editProductModal.open,#editBannerModal.open,#checkoutModal.open{
-    display:flex!important;flex-direction:column!important;
-    opacity:1!important;pointer-events:auto!important;
-    transform:none!important;
+    opacity:1!important;pointer-events:auto!important;transform:none!important;
   }
   #editProductModal .modal-head,#editBannerModal .modal-head,#checkoutModal .modal-head{
-    flex:0 0 auto!important;
+    flex:0 0 auto!important;width:100%!important;
     padding:14px 18px!important;
-    background:var(--paper)!important;
-    border-bottom:1px solid var(--line)!important;
+    background:var(--paper)!important;background-color:var(--paper)!important;
+    border:0!important;border-bottom:1px solid var(--line)!important;
+    border-radius:0!important;box-shadow:none!important;
   }
   #editProductModal .modal-body,#editBannerModal .modal-body,#checkoutModal .modal-body{
-    flex:1 1 auto!important;min-height:0!important;
+    display:block!important;flex:1 1 0!important;width:100%!important;
+    min-height:0!important;max-height:none!important;
     overflow-y:auto!important;overflow-x:hidden!important;
     overscroll-behavior:contain;
     padding:16px 18px calc(22px + env(safe-area-inset-bottom))!important;
+    background:var(--paper)!important;background-color:var(--paper)!important;
     -webkit-overflow-scrolling:touch;
-    -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
-    filter:none!important;
+    -webkit-backdrop-filter:none!important;backdrop-filter:none!important;filter:none!important;
   }
   #editProductModal .modal-body form,#editBannerModal .modal-body form,#checkoutModal .modal-body form{
-    width:100%;max-width:100%;
+    display:block!important;width:100%!important;max-width:100%!important;margin:0 auto!important;
   }
   @media(min-width:760px){
+    :root{--mr-nav-clearance:74px}
     #editProductModal .modal-body,#editBannerModal .modal-body,#checkoutModal .modal-body{
       padding:22px 28px 28px!important;
     }
     #editProductModal .modal-body form,#editBannerModal .modal-body form,#checkoutModal .modal-body form{
-      max-width:900px;margin:0 auto;
+      max-width:900px!important;
     }
   }
 </style>
