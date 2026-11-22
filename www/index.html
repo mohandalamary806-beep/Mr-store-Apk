@@ -7192,36 +7192,38 @@ function _setupGoogleButtons() {
   }
 </style>
 <style id="mr-fullscreen-edit-forms-fix">
-  /* These forms fill the usable viewport and stop above the fixed bottom dock. */
-  #editProductOverlay,#editBannerOverlay,#checkoutOverlay{
-    inset:0 0 var(--mr-nav-clearance) 0!important;
-    z-index:160!important;
-  }
+  /* Keep the original modal open/close behavior; only size the three forms. */
   #editProductModal,#editBannerModal,#checkoutModal{
     position:fixed!important;
-    inset:0 0 var(--mr-nav-clearance) 0!important;
-    top:0!important;left:0!important;right:0!important;bottom:var(--mr-nav-clearance)!important;
+    top:0!important;left:0!important;right:0!important;
+    bottom:var(--mr-nav-clearance)!important;
     width:100%!important;max-width:none!important;
     height:auto!important;max-height:none!important;
-    margin:0!important;border:0!important;border-radius:0!important;
-    transform:none!important;z-index:170!important;
-    display:none!important;flex-direction:column!important;
-    overflow:hidden!important;opacity:1!important;
-    pointer-events:none!important;background:var(--paper)!important;
+    margin:0!important;border-radius:0!important;
+    z-index:147!important;overflow:hidden!important;
+    transform:none!important;
+    -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+    filter:none!important;
   }
   #editProductModal.open,#editBannerModal.open,#checkoutModal.open{
-    display:flex!important;pointer-events:auto!important;transform:none!important;
+    display:flex!important;flex-direction:column!important;
+    opacity:1!important;pointer-events:auto!important;
+    transform:none!important;
   }
   #editProductModal .modal-head,#editBannerModal .modal-head,#checkoutModal .modal-head{
-    position:sticky;top:0;z-index:2;flex:0 0 auto;
-    padding:14px 18px!important;background:var(--paper);
-    border-bottom:1px solid var(--line);
+    flex:0 0 auto!important;
+    padding:14px 18px!important;
+    background:var(--paper)!important;
+    border-bottom:1px solid var(--line)!important;
   }
   #editProductModal .modal-body,#editBannerModal .modal-body,#checkoutModal .modal-body{
     flex:1 1 auto!important;min-height:0!important;
     overflow-y:auto!important;overflow-x:hidden!important;
-    overscroll-behavior:contain;padding:16px 18px calc(22px + env(safe-area-inset-bottom))!important;
+    overscroll-behavior:contain;
+    padding:16px 18px calc(22px + env(safe-area-inset-bottom))!important;
     -webkit-overflow-scrolling:touch;
+    -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+    filter:none!important;
   }
   #editProductModal .modal-body form,#editBannerModal .modal-body form,#checkoutModal .modal-body form{
     width:100%;max-width:100%;
@@ -7306,6 +7308,15 @@ function _setupGoogleButtons() {
       openSettingsModal(true);
     }
   };
+
+  // The home hero CTA switches to the products view instead of targeting a hidden section.
+  const heroShopButton=document.getElementById('heroBtnText');
+  if(heroShopButton){
+    heroShopButton.addEventListener('click',event=>{
+      event.preventDefault();
+      window.mrStoreView('products');
+    });
+  }
 
   // Keep language switching in sync with the single navigation bar.
   const languageSelect=document.getElementById('mrLanguageSelect');
