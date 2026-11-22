@@ -785,3 +785,25 @@ input:focus, textarea:focus, select:focus {
     backdrop-filter: none !important;
   }
 }
+
+/* ================================================================
+   NO TEXT SELECTION / COPY — behaves like a native app, not a website.
+   Form fields stay selectable so people can still type and paste.
+   Add class="allow-select" to any element that must stay copyable.
+   ================================================================ */
+html, body, body * {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+body input, body textarea, body select,
+body [contenteditable=""], body [contenteditable="true"],
+body .allow-select, body .allow-select * {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  -webkit-touch-callout: default !important;
+}
+img, a, svg, video {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
