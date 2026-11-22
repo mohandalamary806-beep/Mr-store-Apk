@@ -2547,13 +2547,68 @@ body.mr-products-view main>.hero,body.mr-products-view main>#trustStrip,body.mr-
 body.mr-products-view #products{display:block!important;padding-top:20px!important}
 body.mr-products-view .site-reviews-section,body.mr-products-view .site-footer{display:none!important}
 body.mr-home-view #siteReviewsSection{display:none!important}
-@media(min-width:760px){
- .mr-bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(620px,calc(100% - 40px));bottom:14px;border:1px solid var(--line);border-radius:18px;padding:8px;min-height:62px}
- body{padding-bottom:20px!important}
- #cartDrawer{max-width:900px!important;left:50%!important;right:auto!important;transform:translate(-50%,110%)!important}
- #cartDrawer.open{transform:translate(-50%,0)!important}
-}
 
+/* ===== Requested app navigation and safe content area ===== */
+:root{--mr-nav-h:66px;--mr-nav-clearance:calc(var(--mr-nav-h) + env(safe-area-inset-bottom))}
+body{padding-bottom:var(--mr-nav-clearance)!important}
+.mr-bottom-nav{grid-template-columns:repeat(6,minmax(0,1fr))!important;width:100%;}
+.mr-bottom-nav button{position:relative;min-width:0;padding-inline:1px;}
+.mr-bottom-nav button .mr-nav-icon{font-size:1.12rem;}
+.mr-bottom-nav .cart-badge{top:0;right:calc(50% - 19px);left:auto;width:17px;height:17px;font-size:.54rem;z-index:2;}
+.mr-bottom-nav .orders-badge{top:0;left:calc(50% - 19px);right:auto;min-width:16px;height:16px;font-size:.52rem;z-index:2;}
+/* Header cart removed: cart is accessed only from the bottom navigation. */
+#cartToggle{display:none!important}
+/* Three remaining trust items after removing the 14-day return text. */
+.trust-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:860px){.trust-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* The cart is a standalone app page between the top and bottom navigation bars. */
+#cartOverlay{display:none!important}
+body.mr-cart-view #flashSaleBanner,
+body.mr-cart-view .site-header,
+body.mr-cart-view .mr-welcome-strip,
+body.mr-cart-view main,
+body.mr-cart-view .site-footer,
+body.mr-cart-view #siteReviewsSection{display:none!important}
+body.mr-cart-view #cartDrawer,
+body.mr-cart-view #cartDrawer.open{
+  display:flex!important;position:fixed!important;top:0!important;left:0!important;right:0!important;
+  bottom:var(--mr-nav-clearance)!important;width:100%!important;max-width:none!important;height:auto!important;
+  max-height:none!important;transform:none!important;z-index:140!important;border-radius:0!important;
+  flex-direction:column!important;overflow:hidden!important;background:var(--paper)!important;
+}
+body.mr-cart-view #cartDrawer .drawer-head{flex:0 0 auto}
+body.mr-cart-view #cartDrawer .drawer-body{flex:1 1 auto;min-height:0;overflow:auto}
+body.mr-cart-view #cartDrawer .drawer-foot{flex:0 0 auto}
+
+/* Keep dialogs and their action buttons in the usable area above the dock. */
+.overlay{z-index:145!important;bottom:var(--mr-nav-clearance)!important}
+.modal:not(#settingsModal):not(#myOrdersModal){
+  z-index:147!important;top:calc((100dvh - var(--mr-nav-clearance))/2)!important;
+  max-height:calc(100dvh - var(--mr-nav-clearance) - 20px)!important;
+}
+.confirm-overlay{z-index:145!important;bottom:var(--mr-nav-clearance)!important}
+/* Product details also stop above the fixed bottom navigation. */
+#productDetailOverlay{z-index:135!important;bottom:var(--mr-nav-clearance)!important}
+#productDetailModal{
+  inset:0 0 var(--mr-nav-clearance) 0!important;top:0!important;left:0!important;right:0!important;
+  bottom:var(--mr-nav-clearance)!important;height:auto!important;z-index:140!important;
+}
+#settingsModal,#myOrdersModal{
+  inset:0 0 var(--mr-nav-clearance) 0!important;top:0!important;left:0!important;right:0!important;
+  bottom:var(--mr-nav-clearance)!important;width:100%!important;max-width:none!important;
+  height:auto!important;max-height:none!important;margin:0!important;border-radius:0!important;
+  transform:none!important;z-index:140!important;display:none!important;opacity:1!important;
+}
+#settingsModal.open,#myOrdersModal.open{display:flex!important;flex-direction:column!important}
+#settingsModal .modal-body,#myOrdersModal .modal-body{padding-bottom:18px!important}
+
+@media(min-width:760px){
+ :root{--mr-nav-clearance:90px}
+ .mr-bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(740px,calc(100% - 40px));bottom:14px;border:1px solid var(--line);border-radius:18px;padding:8px;min-height:62px}
+ body{padding-bottom:90px!important}
+ body.mr-cart-view #cartDrawer,body.mr-cart-view #cartDrawer.open{bottom:90px!important;max-width:900px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important}
+}
 </style>
 </head>
 <body>
@@ -2627,18 +2682,9 @@ body.mr-home-view #siteReviewsSection{display:none!important}
       <button class="icon-btn" id="searchToggle" aria-label="بحث" onclick="document.getElementById('searchInput').focus();document.getElementById('products').scrollIntoView({behavior:'smooth'});">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>
       </button>
-      <!-- زرار الطلبات — يظهر على الموبايل بس -->
-      <button class="icon-btn orders-mobile-btn" aria-label="طلباتي" onclick="openMyOrdersModal()" id="ordersToggle">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
-        <span class="orders-badge" id="ordersBadge"></span>
-      </button>
       <button class="icon-btn" id="darkModeToggle" aria-label="تبديل الوضع الليلي" onclick="toggleDarkMode()" title="وضع ليلي / نهاري">
         <svg id="darkIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         <svg id="lightIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="display:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      </button>
-      <button class="icon-btn" id="cartToggle" aria-label="عربة التسوق">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
-        <span class="cart-badge" id="cartBadge">0</span>
       </button>
       <button class="icon-btn menu-toggle" id="menuOpenBtn" aria-label="القائمة">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
@@ -2700,7 +2746,6 @@ body.mr-home-view #siteReviewsSection{display:none!important}
     <div class="container trust-grid">
       <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h11v8H2z"/><path d="M13 11h4l3 3v2h-7z"/><circle cx="6" cy="18" r="1.6"/><circle cx="16.5" cy="18" r="1.6"/></svg> توصيل لكل انحاء مصر</div>
       <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="1.5"/><circle cx="12" cy="12" r="3"/></svg> الدفع عند الاستلام</div>
-      <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 1 3 6.7"/><path d="M3 12V7M3 12h5"/></svg> استرجاع خلال 14 يوم</div>
       <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-8.9 8.49 8.6 8.6 0 0 1-3.8-.9L3 20l1-4.8A8.5 8.5 0 1 1 21 11.5z"/></svg> دعم عبر واتساب</div>
     </div>
   </section>
@@ -3362,6 +3407,20 @@ body.mr-home-view #siteReviewsSection{display:none!important}
       <button class="settings-action-btn" type="button" onclick="toggleDarkMode()" id="mrThemeButton">تبديل الوضع الليلي</button>
     </div>
 
+    <div class="settings-divider" id="mrAdminSettingsDivider" style="display:none;"></div>
+    <div class="settings-section" id="mrAdminSettingsSection" style="display:none;">
+      <div class="settings-label">إدارة المتجر</div>
+      <div class="settings-user-card" style="margin-bottom:10px;">
+        <div class="settings-user-info">
+          <div class="settings-user-name">لوحة التحكم</div>
+          <div class="settings-user-email" dir="ltr">mohandalamary806@gmail.com</div>
+        </div>
+      </div>
+      <button class="settings-action-btn" type="button" onclick="openAdminFromSettings()" style="width:100%;justify-content:center;">
+        فتح لوحة التحكم
+      </button>
+    </div>
+
     <div class="settings-divider"></div>
     <div class="settings-section" id="settingsSupportSection">
       <div class="settings-label">تواصل الدعم</div>
@@ -3578,6 +3637,7 @@ const ADMIN_PASSWORD = "mrstore2026";
 const GOOGLE_CLIENT_ID = "443646227114-vbstcio2leo5l5ene86mtmd9cv6djdln.apps.googleusercontent.com";
 const ADMIN_ALLOWED_EMAILS = ["mrstore010011@gmail.com", "mohandalamary806@gmail.com"];
 const ADMIN_EMAIL_KEY = 'mrstore_admin_google_email';
+const ADMIN_SETTINGS_EMAIL = 'mohandalamary806@gmail.com';
 const USER_AUTH_KEY = 'mrstore_user_data';
 const PRODUCTS_STORAGE_KEY = 'mrstore_products_data';
 const BANNER_STORAGE_KEY = 'mrstore_banner_data';
@@ -4083,6 +4143,8 @@ async function openMyOrdersModal() {
   const overlay = document.getElementById('myOrdersOverlay');
   const list = document.getElementById('myOrdersList');
   const user = getUserData();
+  modal.classList.add('open');
+  overlay.classList.add('open');
 
   if (!user || (!user.email && !user.name)) {
     list.innerHTML = `
@@ -4170,6 +4232,7 @@ async function openMyOrdersModal() {
 function closeMyOrdersModal() {
   document.getElementById('myOrdersModal').classList.remove('open');
   document.getElementById('myOrdersOverlay').classList.remove('open');
+  if (window.mrStoreView) window.mrStoreView('home');
 }
 
 /* ============ SETTINGS MODAL ============ */
@@ -4259,6 +4322,13 @@ function openSettingsModal() {
   _renderSettingsAvatar(user);
   _renderFramePicker(user);
 
+  // إظهار لوحة التحكم داخل الإعدادات لحساب الإدارة المحدد فقط.
+  const adminSettingsVisible = String(user.email || '').trim().toLowerCase() === ADMIN_SETTINGS_EMAIL;
+  const adminSettingsSection = document.getElementById('mrAdminSettingsSection');
+  const adminSettingsDivider = document.getElementById('mrAdminSettingsDivider');
+  if (adminSettingsSection) adminSettingsSection.style.display = adminSettingsVisible ? '' : 'none';
+  if (adminSettingsDivider) adminSettingsDivider.style.display = adminSettingsVisible ? '' : 'none';
+
   /* تحقق من إمكانية تغيير الاسم */
   const changeBtn = document.getElementById('settingsChangeNameBtn');
   if (changeBtn) {
@@ -4276,6 +4346,21 @@ function openSettingsModal() {
 function closeSettingsModal() {
   document.getElementById('settingsModal').classList.remove('open');
   document.getElementById('settingsOverlay').classList.remove('open');
+}
+
+function openAdminFromSettings() {
+  const user = getUserData();
+  const currentEmail = String(user && user.email || '').trim().toLowerCase();
+  if (currentEmail !== ADMIN_SETTINGS_EMAIL || !ADMIN_ALLOWED_EMAILS.includes(currentEmail)) {
+    showToast('هذا القسم مخصص لحساب الإدارة المحدد فقط');
+    return;
+  }
+  closeSettingsModal();
+  if (location.hash === '#admin') {
+    handleRoute();
+  } else {
+    location.hash = '#admin';
+  }
 }
 
 function openSettingsNameEdit() {
@@ -5270,12 +5355,29 @@ document.getElementById('cartItems').addEventListener('click', e=>{
   if(btn.dataset.action==='remove') removeFromCart(id);
 });
 
-/* ============ CART DRAWER TOGGLE ============ */
+/* ============ CART PAGE NAVIGATION ============ */
 const cartDrawer = document.getElementById('cartDrawer');
 const cartOverlay = document.getElementById('cartOverlay');
-function openCart(){ cartDrawer.classList.add('open'); cartOverlay.classList.add('open'); }
-function closeCart(){ cartDrawer.classList.remove('open'); cartOverlay.classList.remove('open'); }
-document.getElementById('cartToggle').addEventListener('click', openCart);
+function openCart(){
+  document.body.classList.remove('mr-home-view','mr-products-view','mr-reviews-view');
+  document.body.classList.add('mr-cart-view');
+  cartDrawer.classList.add('open');
+  cartOverlay.classList.remove('open');
+  if (typeof renderCart === 'function') renderCart();
+  window.scrollTo(0,0);
+}
+function closeCart(){
+  cartDrawer.classList.remove('open');
+  cartOverlay.classList.remove('open');
+  if (window.mrStoreView) window.mrStoreView('home');
+  else {
+    document.body.classList.remove('mr-cart-view','mr-products-view','mr-reviews-view');
+    document.body.classList.add('mr-home-view');
+    window.scrollTo(0,0);
+  }
+}
+const headerCartToggle = document.getElementById('cartToggle');
+if (headerCartToggle) headerCartToggle.addEventListener('click', openCart);
 document.getElementById('cartCloseBtn').addEventListener('click', closeCart);
 cartOverlay.addEventListener('click', closeCart);
 
@@ -7027,7 +7129,8 @@ function _setupGoogleButtons() {
 <nav class="mr-bottom-nav" aria-label="التنقل الرئيسي">
  <button type="button" data-mr-view="home" class="active"><span class="mr-nav-icon">⌂</span><span>الرئيسية</span></button>
  <button type="button" data-mr-view="products"><span class="mr-nav-icon">▦</span><span>التسوق</span></button>
- <button type="button" data-mr-view="cart"><span class="mr-nav-icon">🛒</span><span>العربة</span></button>
+ <button type="button" data-mr-view="cart"><span class="mr-nav-icon">🛒</span><span>العربة</span><span class="cart-badge" id="cartBadge">0</span></button>
+ <button type="button" data-mr-view="orders"><span class="mr-nav-icon">▤</span><span>طلباتي</span><span class="orders-badge" id="ordersBadge"></span></button>
  <button type="button" data-mr-view="reviews"><span class="mr-nav-icon">★</span><span>التقييمات</span></button>
  <button type="button" data-mr-view="profile"><span class="mr-nav-icon">♙</span><span>بروفايل</span></button>
 </nav>
@@ -7054,21 +7157,31 @@ function _setupGoogleButtons() {
    }
  }
  function view(v){
-   document.body.classList.remove('mr-home-view','mr-products-view','mr-reviews-view');
+   document.body.classList.remove('mr-home-view','mr-products-view','mr-reviews-view','mr-cart-view');
+   if(v!=='cart'){
+     const cartPage=$('#cartDrawer');if(cartPage)cartPage.classList.remove('open');
+     const cartShade=$('#cartOverlay');if(cartShade)cartShade.classList.remove('open');
+   }
+   const welcome=$('#mrWelcomeStrip');
    if(v==='home'){
      document.body.classList.add('mr-home-view');setActive(v);
-     window.scrollTo(0,0);$('#mrWelcomeStrip').style.display='';
+     if(welcome)welcome.style.display='';
+     window.scrollTo(0,0);
    }else if(v==='products'){
      document.body.classList.add('mr-products-view');setActive(v);
-     $('#mrWelcomeStrip').style.display='none';$('#products').scrollIntoView({block:'start'});
+     if(welcome)welcome.style.display='none';
+     const products=$('#products');if(products)products.scrollIntoView({block:'start'});
    }else if(v==='cart'){
-     $('#mrWelcomeStrip').style.display='none';setActive(v);
+     if(welcome)welcome.style.display='none';setActive(v);
      if(typeof openCart==='function')openCart();
+   }else if(v==='orders'){
+     if(welcome)welcome.style.display='none';setActive(v);
+     if(typeof openMyOrdersModal==='function')openMyOrdersModal();
    }else if(v==='reviews'){
      document.body.classList.add('mr-reviews-view');setActive(v);
-     $('#mrWelcomeStrip').style.display='none';window.scrollTo(0,0);
+     if(welcome)welcome.style.display='none';window.scrollTo(0,0);
    }else if(v==='profile'){
-     $('#mrWelcomeStrip').style.display='none';setActive(v);
+     if(welcome)welcome.style.display='none';setActive(v);
      if(typeof getUserData==='function'&&!getUserData()){if(typeof openUserAuthModal==='function')openUserAuthModal();return}
      if(typeof openSettingsModal==='function')openSettingsModal();
    }
