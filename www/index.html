@@ -2583,7 +2583,7 @@ body.mr-cart-view #cartDrawer .drawer-foot{flex:0 0 auto}
 
 /* Keep dialogs and their action buttons in the usable area above the dock. */
 .overlay{z-index:145!important;bottom:var(--mr-nav-clearance)!important}
-.modal:not(#settingsModal):not(#myOrdersModal){
+.modal:not(#settingsModal):not(#myOrdersModal):not(#editProductModal):not(#editBannerModal):not(#checkoutModal){
   z-index:147!important;top:calc((100dvh - var(--mr-nav-clearance))/2)!important;
   max-height:calc(100dvh - var(--mr-nav-clearance) - 20px)!important;
 }
@@ -7206,7 +7206,7 @@ function _setupGoogleButtons() {
     align-items:stretch!important;justify-content:flex-start!important;
     z-index:480!important;overflow:hidden!important;
     transform:none!important;translate:none!important;
-    background:var(--paper)!important;background-color:var(--paper)!important;
+    background:var(--canvas)!important;background-color:var(--canvas)!important;
     border:0!important;border-radius:0!important;box-shadow:none!important;
     filter:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;
     opacity:0!important;visibility:hidden!important;pointer-events:none!important;
