@@ -6,7 +6,7 @@ on:
     branches: [ main, master ]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -36,7 +36,12 @@ jobs:
         run: npx cap add android
 
       - name: Generate Android icons and splash assets
-        run: npx capacitor-assets generate --android
+        run: npx capacitor-assets generate --android --iconBackgroundColor '#0A1230' --splashBackgroundColor '#0A1230'
+
+      # Replaces the generated launcher icons with crisp per-density versions and
+      # applies the MR Store launch (splash) screen: navy background + glowing logo.
+      - name: Apply MR Store icon and splash screen
+        run: python3 .github/scripts/apply_android_overrides.py
 
       - name: Sync web app
         run: npx cap sync android
@@ -78,9 +83,25 @@ jobs:
           keytool -printcert -jarfile android/app/build/outputs/apk/debug/app-debug.apk |
             grep -E 'SHA1:|SHA256:'
 
+      - name: Name the APK MR-Store.apk
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk MR-Store.apk
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: MR-Store-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: MR-Store
+          path: MR-Store.apk
           if-no-files-found: error
+
+      # Direct download link that always points to the newest build:
+      # https://github.com/<user>/<repo>/releases/latest/download/MR-Store.apk
+      - name: Publish release (MR-Store.apk)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --yes --cleanup-tag || true
+          gh release create latest MR-Store.apk \
+            --title "MR Store" \
+            --notes "Latest MR Store build ($(date -u +'%Y-%m-%d %H:%M UTC'))." \
+            --target "${{ github.sha }}" \
+            --latest
