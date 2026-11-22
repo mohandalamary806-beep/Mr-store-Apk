@@ -2611,7 +2611,7 @@ body.mr-cart-view #cartDrawer .drawer-foot{flex:0 0 auto}
 }
 </style>
 </head>
-<body>
+<body class="mr-home-view">
 
 <!-- ============ FLASH SALE BANNER ============ -->
 <div id="flashSaleBanner" role="alert" aria-live="polite">
@@ -2985,7 +2985,16 @@ body.mr-cart-view #cartDrawer .drawer-foot{flex:0 0 auto}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg>
     </button>
   </div>
-  <div class="drawer-body" id="cartItems"></div>
+  <div class="drawer-body cart-page-body" id="cartPageBody">
+    <div id="cartItems"></div>
+    <button type="button" class="cart-orders-card" onclick="mrStoreView('orders')" aria-label="عرض طلباتي">
+      <span class="cart-orders-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l3 3v15H5V3h3Z"/><path d="M8 3v5h8V3M8 13h8M8 17h5"/></svg>
+      </span>
+      <span class="cart-orders-copy"><strong>طلباتي</strong><small>تابع حالة طلباتك السابقة وتفاصيلها</small></span>
+      <svg class="cart-orders-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+  </div>
   <div style="padding: 0 24px;">
     <div class="coupon-box">
       <input type="text" id="couponInput" placeholder="أدخل كود الخصم (إن وجد)">
@@ -4138,7 +4147,16 @@ async function addOrder(orderData) {
 }
 
 // 3. فتح نافذة "الطلبات" وعرض طلبات الجيميل المسجل فقط مع تحديث لحظي
-async function openMyOrdersModal() {
+async function openMyOrdersModal(fromNavigation = false) {
+  if (!fromNavigation && typeof window.mrStoreView === 'function') {
+    window.mrStoreView('orders');
+    return;
+  }
+  if (typeof closeCart === 'function') closeCart(true);
+  if (typeof closeSettingsModal === 'function') closeSettingsModal(true);
+  document.body.classList.remove('mr-home-view','mr-products-view','mr-favorites-view','mr-reviews-view','mr-cart-view','mr-settings-view');
+  document.body.classList.add('mr-orders-view');
+  const viewToken = window._mrViewGeneration || 0;
   const modal = document.getElementById('myOrdersModal');
   const overlay = document.getElementById('myOrdersOverlay');
   const list = document.getElementById('myOrdersList');
@@ -4160,7 +4178,8 @@ async function openMyOrdersModal() {
     overlay.classList.add('open');
 
     // جلب البيانات الجديدة عشان تظهر لو طلبتها من جهاز تاني
-    await loadOrders(); 
+    await loadOrders();
+    if ((window._mrViewGeneration || 0) !== viewToken || window._mrCurrentView !== 'orders') return;
 
     // فلترة الطلبات بناءً على إيميل المستخدم لضمان الخصوصية
     const myOrders = ORDERS.filter(o => 
@@ -4229,10 +4248,11 @@ async function openMyOrdersModal() {
 }
 
 // 4. إغلاق النافذة
-function closeMyOrdersModal() {
+function closeMyOrdersModal(skipNavigation = false) {
   document.getElementById('myOrdersModal').classList.remove('open');
   document.getElementById('myOrdersOverlay').classList.remove('open');
-  if (window.mrStoreView) window.mrStoreView('home');
+  document.body.classList.remove('mr-orders-view');
+  if (!skipNavigation && window.mrStoreView) window.mrStoreView('home');
 }
 
 /* ============ SETTINGS MODAL ============ */
@@ -4308,7 +4328,15 @@ async function handlePicUpload(input) {
   input.value = '';
 }
 
-function openSettingsModal() {
+function openSettingsModal(fromNavigation = false) {
+  if (!fromNavigation && typeof window.mrStoreView === 'function') {
+    window.mrStoreView('settings');
+    return;
+  }
+  if (typeof closeCart === 'function') closeCart(true);
+  if (typeof closeMyOrdersModal === 'function') closeMyOrdersModal(true);
+  document.body.classList.remove('mr-home-view','mr-products-view','mr-favorites-view','mr-reviews-view','mr-cart-view','mr-orders-view');
+  document.body.classList.add('mr-settings-view');
   const user = getUserData();
   if (!user) return;
 
@@ -4343,9 +4371,11 @@ function openSettingsModal() {
   document.getElementById('settingsOverlay').classList.add('open');
 }
 
-function closeSettingsModal() {
+function closeSettingsModal(skipNavigation = false) {
   document.getElementById('settingsModal').classList.remove('open');
   document.getElementById('settingsOverlay').classList.remove('open');
+  document.body.classList.remove('mr-settings-view');
+  if (!skipNavigation && window.mrStoreView) window.mrStoreView('home');
 }
 
 function openAdminFromSettings() {
@@ -5068,7 +5098,7 @@ async function addToCart(id, triggerEl){
   showToast('تمت الإضافة للعربة ✓');
 
   // fly-dot animation
-  const cartBtn = document.getElementById('cartToggle');
+  const cartBtn = document.querySelector('.mr-bottom-nav [data-mr-view="cart"]') || document.getElementById('cartToggle');
   if (triggerEl && cartBtn) {
     const fromRect = triggerEl.getBoundingClientRect();
     const toRect = cartBtn.getBoundingClientRect();
@@ -5315,8 +5345,11 @@ function renderCart(){
   const wrap = document.getElementById('cartItems');
   const badge = document.getElementById('cartBadge');
   const count = cartCount();
-  badge.textContent = count;
-  badge.style.display = count>0 ? 'flex' : 'none';
+  if (badge) {
+    badge.textContent = count > 99 ? '99+' : String(count);
+    badge.style.display = count > 0 ? 'flex' : 'none';
+    badge.setAttribute('aria-label', count ? `عدد المنتجات في السلة ${count}` : 'السلة فارغة');
+  }
   wrap.innerHTML = state.cart.length === 0 ? `<div class="cart-empty">لسه مفيش حاجة في العربة.<br>يلا نتصفح المنتجات؟</div>` : state.cart.map(cartItemHTML).join('');
   
   const origTotal = state.cart.reduce((s,i)=>s+(findProduct(i.id) ? findProduct(i.id).price : 0)*i.qty,0);
@@ -5358,20 +5391,26 @@ document.getElementById('cartItems').addEventListener('click', e=>{
 /* ============ CART PAGE NAVIGATION ============ */
 const cartDrawer = document.getElementById('cartDrawer');
 const cartOverlay = document.getElementById('cartOverlay');
-function openCart(){
-  document.body.classList.remove('mr-home-view','mr-products-view','mr-reviews-view');
+function openCart(fromNavigation = false){
+  if (!fromNavigation && typeof window.mrStoreView === 'function') {
+    window.mrStoreView('cart');
+    return;
+  }
+  if (typeof closeSettingsModal === 'function') closeSettingsModal(true);
+  if (typeof closeMyOrdersModal === 'function') closeMyOrdersModal(true);
+  document.body.classList.remove('mr-home-view','mr-products-view','mr-favorites-view','mr-reviews-view','mr-orders-view','mr-settings-view');
   document.body.classList.add('mr-cart-view');
   cartDrawer.classList.add('open');
   cartOverlay.classList.remove('open');
   if (typeof renderCart === 'function') renderCart();
   window.scrollTo(0,0);
 }
-function closeCart(){
+function closeCart(skipNavigation = false){
   cartDrawer.classList.remove('open');
   cartOverlay.classList.remove('open');
-  if (window.mrStoreView) window.mrStoreView('home');
-  else {
-    document.body.classList.remove('mr-cart-view','mr-products-view','mr-reviews-view');
+  document.body.classList.remove('mr-cart-view');
+  if (!skipNavigation && window.mrStoreView) window.mrStoreView('home');
+  else if (!skipNavigation) {
     document.body.classList.add('mr-home-view');
     window.scrollTo(0,0);
   }
@@ -7071,138 +7110,177 @@ function _setupGoogleButtons() {
 }
 </script>
 
-<!-- MR Store native-app style glass navigation -->
-<nav class="mr-glass-nav" id="mrGlassNav" aria-label="التنقل الرئيسي">
-  <button class="mr-nav-item active" data-nav="home" onclick="mrNavigate('home')" aria-label="الرئيسية">
-    <svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span data-ar="الرئيسية" data-en="Home">الرئيسية</span>
-  </button>
-  <button class="mr-nav-item" data-nav="products" onclick="mrNavigate('products')" aria-label="المنتجات">
-    <svg viewBox="0 0 24 24"><path d="M5 7h14l1 14H4L5 7Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span data-ar="المنتجات" data-en="Shop">المنتجات</span>
-  </button>
-  <button class="mr-nav-item" data-nav="favorites" onclick="mrNavigate('favorites')" aria-label="المفضلة">
-    <svg viewBox="0 0 24 24"><path d="M20.8 8.8c0 5.2-8.8 11-8.8 11S3.2 14 3.2 8.8A4.8 4.8 0 0 1 12 6.2a4.8 4.8 0 0 1 8.8 2.6Z"/></svg><span data-ar="المفضلة" data-en="Saved">المفضلة</span>
-  </button>
-  <button class="mr-nav-item" data-nav="cart" onclick="mrNavigate('cart')" aria-label="السلة">
-    <svg viewBox="0 0 24 24"><path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.9a2 2 0 0 0 2-1.6L22 8H6"/><circle cx="10" cy="21" r="1"/><circle cx="18" cy="21" r="1"/></svg><span data-ar="السلة" data-en="Cart">السلة</span>
-  </button>
-  <button class="mr-nav-item" data-nav="settings" onclick="mrNavigate('settings')" aria-label="الإعدادات">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.4 1.1-1.5 2.6-1.7-.7a8 8 0 0 1-1.6.9l-.3 1.8h-3l-.3-1.8a8 8 0 0 1-1.6-.9l-1.7.7-1.5-2.6 1.4-1.1a8 8 0 0 1 0-1.9l-1.4-1.1 1.5-2.6 1.7.7a8 8 0 0 1 1.6-.9l.3-1.8h3l.3 1.8a8 8 0 0 1 1.6.9l1.7-.7 1.5 2.6-1.4 1.1a8 8 0 0 1 0 1.9Z"/></svg><span data-ar="الإعدادات" data-en="Settings">الإعدادات</span>
-  </button>
-</nav>
-
-<script>
-(function(){
- const select=document.getElementById('mrLanguageSelect');
- const stored=localStorage.getItem('mrstore_language')||'ar';
- function applyLang(lang){
-   const en=lang==='en'; document.documentElement.lang=en?'en':'ar';document.documentElement.dir=en?'ltr':'rtl';
-   document.querySelectorAll('.mr-nav-item span').forEach(el=>el.textContent=el.dataset[en?'en':'ar']);
-   const labels={
-    mrLangHeading:en?'App language':'لغة التطبيق',mrLangHint:en?'Your choice is saved on this device.':'يتم حفظ اختيارك على هذا الجهاز.',
-    mrAppearanceHeading:en?'Appearance':'المظهر',mrThemeButton:en?'Toggle dark mode':'تبديل الوضع الليلي'
-   };
-   Object.entries(labels).forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.textContent=value});
-   localStorage.setItem('mrstore_language',lang);
- }
- if(select){select.value=stored;applyLang(stored);select.addEventListener('change',()=>applyLang(select.value))}
- window.mrNavigate=function(target){
-   if(target!=='settings' && typeof closeSettingsModal==='function') closeSettingsModal();
-   document.querySelectorAll('.mr-nav-item').forEach(b=>b.classList.toggle('active',b.dataset.nav===target));
-   if(target==='home'){window.scrollTo({top:0,behavior:'smooth'});return}
-   if(target==='products'){document.getElementById('products')?.scrollIntoView({behavior:'smooth'});return}
-   if(target==='favorites'){
-     document.getElementById('products')?.scrollIntoView({behavior:'smooth'});
-     setTimeout(()=>document.querySelector('.filter-tab[data-badge="favorites"]')?.click(),250);return
-   }
-   if(target==='cart'){if(typeof openCart==='function')openCart();return}
-   if(target==='settings'){
-     if(typeof openSettingsModal==='function'){if(!window.getUserData?.()) {document.querySelector('#userAuthWrap button')?.click();return}openSettingsModal()}
-   }
- };
- const nav=document.getElementById('mrGlassNav');
- window.addEventListener('scroll',()=>{if(!nav)return;const products=document.getElementById('products');if(products&&window.scrollY>products.offsetTop-160){document.querySelectorAll('.mr-nav-item').forEach(b=>b.classList.toggle('active',b.dataset.nav==='products'))}else if(window.scrollY<250){document.querySelectorAll('.mr-nav-item').forEach(b=>b.classList.toggle('active',b.dataset.nav==='home'))}},{passive:true});
-})();
-</script>
-
 <script src="native-google-auth.js"></script>
 
-<nav class="mr-bottom-nav" aria-label="التنقل الرئيسي">
- <button type="button" data-mr-view="home" class="active"><span class="mr-nav-icon">⌂</span><span>الرئيسية</span></button>
- <button type="button" data-mr-view="products"><span class="mr-nav-icon">▦</span><span>التسوق</span></button>
- <button type="button" data-mr-view="cart"><span class="mr-nav-icon">🛒</span><span>العربة</span><span class="cart-badge" id="cartBadge">0</span></button>
- <button type="button" data-mr-view="orders"><span class="mr-nav-icon">▤</span><span>طلباتي</span><span class="orders-badge" id="ordersBadge"></span></button>
- <button type="button" data-mr-view="reviews"><span class="mr-nav-icon">★</span><span>التقييمات</span></button>
- <button type="button" data-mr-view="profile"><span class="mr-nav-icon">♙</span><span>بروفايل</span></button>
+<nav class="mr-bottom-nav" id="mrBottomNav" aria-label="التنقل الرئيسي">
+  <button type="button" data-mr-view="home" class="active" aria-label="الرئيسية">
+    <svg class="mr-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>
+    <span data-ar="الرئيسية" data-en="Home">الرئيسية</span>
+  </button>
+  <button type="button" data-mr-view="favorites" aria-label="المفضلة">
+    <svg class="mr-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.8c0 5.2-8.8 11-8.8 11S3.2 14 3.2 8.8A4.8 4.8 0 0 1 12 6.2a4.8 4.8 0 0 1 8.8 2.6Z"/></svg>
+    <span data-ar="المفضلة" data-en="Favorites">المفضلة</span>
+  </button>
+  <button type="button" data-mr-view="cart" aria-label="السلة">
+    <span class="mr-nav-cart-wrap">
+      <svg class="mr-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.9a2 2 0 0 0 2-1.6L22 8H6"/><circle cx="10" cy="21" r="1"/><circle cx="18" cy="21" r="1"/></svg>
+      <span class="cart-badge" id="cartBadge">0</span>
+    </span>
+    <span data-ar="السلة" data-en="Cart">السلة</span>
+  </button>
+  <button type="button" data-mr-view="settings" aria-label="الإعدادات">
+    <svg class="mr-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.4 1.1-1.5 2.6-1.7-.7a8 8 0 0 1-1.6.9l-.3 1.8h-3l-.3-1.8a8 8 0 0 1-1.6-.9l-1.7.7-1.5-2.6 1.4-1.1a8 8 0 0 1 0-1.9l-1.4-1.1 1.5-2.6 1.7.7a8 8 0 0 1 1.6-.9l.3-1.8h3l.3 1.8a8 8 0 0 1 1.6.9l1.7-.7 1.5 2.6-1.4 1.1a8 8 0 0 1 0 1.9Z"/></svg>
+    <span data-ar="الإعدادات" data-en="Settings">الإعدادات</span>
+  </button>
 </nav>
 
+<style id="mr-single-page-navigation">
+  :root{--mr-nav-h:72px;--mr-nav-clearance:calc(var(--mr-nav-h) + env(safe-area-inset-bottom))}
+  body{padding-bottom:var(--mr-nav-clearance)!important;min-height:100dvh}
+  .mr-bottom-nav{position:fixed!important;z-index:500!important;left:0;right:0;bottom:0;min-height:var(--mr-nav-h);padding:8px 12px calc(8px + env(safe-area-inset-bottom));display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:7px;background:rgba(247,249,255,.94);border-top:1px solid rgba(110,130,190,.2);box-shadow:0 -7px 24px rgba(20,35,80,.12);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%)}
+  [data-theme="dark"] .mr-bottom-nav{background:rgba(13,15,20,.95);border-color:var(--line)}
+  .mr-bottom-nav button{position:relative;display:flex;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px 2px;border:0!important;border-radius:14px;background:transparent;color:var(--ink-soft);font:700 .68rem var(--ff-body);}
+  .mr-bottom-nav button .mr-nav-icon{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .mr-bottom-nav button.active{color:var(--denim);background:rgba(83,102,223,.10)}
+  [data-theme="dark"] .mr-bottom-nav button.active{color:#D4A843;background:rgba(212,168,67,.12)}
+  .mr-nav-cart-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+  .mr-bottom-nav .cart-badge{position:absolute!important;display:none;align-items:center;justify-content:center;top:-7px!important;right:-10px!important;left:auto!important;width:auto!important;min-width:19px;height:19px;padding:0 4px;border:2px solid var(--paper);border-radius:999px;background:#E53935!important;color:#fff!important;font:800 .62rem var(--ff-mono);box-shadow:0 2px 7px rgba(229,57,53,.3);z-index:3}
+  .mr-bottom-nav .cart-badge.bounce{animation:badgePop .35s cubic-bezier(.34,1.56,.64,1)}
+  .cart-page-body{display:flex;flex-direction:column;gap:14px}
+  .cart-orders-card{display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px!important;border:1px solid var(--line)!important;border-radius:16px!important;background:var(--canvas)!important;color:var(--ink)!important;text-align:right;box-shadow:0 4px 14px rgba(20,35,80,.06)!important}
+  .cart-orders-icon{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:13px;background:rgba(83,102,223,.12);color:var(--denim)}
+  [data-theme="dark"] .cart-orders-icon{background:rgba(212,168,67,.12);color:#D4A843}
+  .cart-orders-icon svg{width:21px;height:21px}
+  .cart-orders-copy{display:flex;flex:1;flex-direction:column;gap:3px;min-width:0}
+  .cart-orders-copy strong{font-size:.9rem;font-weight:800}
+  .cart-orders-copy small{font-size:.72rem;color:var(--ink-soft);font-weight:500}
+  .cart-orders-arrow{width:18px;height:18px;flex:0 0 18px;color:var(--ink-soft);transform:rotate(180deg)}
+  /* The storefront viewport ends before the fixed bottom navigation. */
+  body.mr-home-view main>.hero,body.mr-products-view main>.hero,body.mr-favorites-view main>.hero{display:none!important}
+  body.mr-home-view .trust-strip,body.mr-products-view .trust-strip,body.mr-favorites-view .trust-strip,
+  body.mr-home-view .site-reviews-section,body.mr-products-view .site-reviews-section,body.mr-favorites-view .site-reviews-section,
+  body.mr-home-view .site-footer,body.mr-products-view .site-footer,body.mr-favorites-view .site-footer,
+  body.mr-home-view #recentlyViewedSection,body.mr-products-view #recentlyViewedSection,body.mr-favorites-view #recentlyViewedSection{display:none!important}
+  body.mr-home-view main>#products,body.mr-products-view main>#products,body.mr-favorites-view main>#products{display:block!important;padding-top:18px!important;padding-bottom:24px!important}
+  body.mr-home-view .mr-welcome-strip{display:none!important}
+  body.mr-cart-view #flashSaleBanner,body.mr-cart-view .site-header,body.mr-cart-view .mr-welcome-strip,body.mr-cart-view main,body.mr-cart-view .site-footer,body.mr-cart-view #siteReviewsSection{display:none!important}
+  body.mr-cart-view #cartDrawer,body.mr-cart-view #cartDrawer.open{display:flex!important;position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:var(--mr-nav-clearance)!important;width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;transform:none!important;z-index:180!important;border-radius:0!important;flex-direction:column!important;overflow:hidden!important;background:var(--paper)!important}
+  body.mr-cart-view #cartDrawer .drawer-head{flex:0 0 auto}
+  body.mr-cart-view #cartDrawer .drawer-body{flex:1 1 auto;min-height:0;overflow:auto}
+  body.mr-cart-view #cartDrawer .drawer-foot{flex:0 0 auto}
+  body.mr-orders-view .site-header,body.mr-orders-view .mr-welcome-strip,body.mr-orders-view main,body.mr-orders-view .site-footer,body.mr-orders-view #siteReviewsSection,body.mr-orders-view #flashSaleBanner,
+  body.mr-settings-view .site-header,body.mr-settings-view .mr-welcome-strip,body.mr-settings-view main,body.mr-settings-view .site-footer,body.mr-settings-view #siteReviewsSection,body.mr-settings-view #flashSaleBanner{display:none!important}
+  #settingsModal,#myOrdersModal{position:fixed!important;inset:0 0 var(--mr-nav-clearance) 0!important;top:0!important;left:0!important;right:0!important;bottom:var(--mr-nav-clearance)!important;width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;margin:0!important;border-radius:0!important;transform:none!important;z-index:180!important;display:none!important;opacity:1!important;background:var(--paper)!important;}
+  #settingsModal.open,#myOrdersModal.open{display:flex!important;flex-direction:column!important}
+  #settingsModal .modal-head,#myOrdersModal .modal-head{position:sticky;top:0;z-index:2;flex:0 0 auto;background:var(--paper)}
+  #settingsModal .modal-body,#myOrdersModal .modal-body{flex:1 1 auto;min-height:0;overflow:auto;padding-bottom:20px!important}
+  #settingsOverlay,#myOrdersOverlay{display:none!important}
+  #cartOverlay{display:none!important}
+  #cartDrawer .drawer-head{padding:14px 18px!important}
+  #cartDrawer .drawer-head h3{font-size:1.6rem}
+  #cartDrawer .drawer-body{padding:14px!important}
+  #cartDrawer .drawer-foot{padding:14px 18px calc(14px + env(safe-area-inset-bottom))!important}
+  @media(min-width:760px){
+    :root{--mr-nav-h:74px;--mr-nav-clearance:90px}
+    .mr-bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(520px,calc(100% - 40px));bottom:12px;border:1px solid var(--line);border-radius:20px;padding:7px 12px;min-height:62px}
+    body.mr-cart-view #cartDrawer,body.mr-cart-view #cartDrawer.open{bottom:90px!important;max-width:900px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important}
+  }
+</style>
 
 <script>
-/* MR Store navigation, greeting and lighter interactions */
 (function(){
- const $=s=>document.querySelector(s);
- function setActive(v){document.querySelectorAll('.mr-bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.mrView===v))}
- function setGreeting(){
-   const user=typeof getUserData==='function'?getUserData():null;
-   const title=$('#mrWelcomeTitle'),sub=$('#mrWelcomeSub');
-   if(!title)return;
-   if(user&&user.email){
-     const key='mrstore_seen_'+String(user.email).toLowerCase();
-     let returning=localStorage.getItem(key)==='1';
-     title.textContent=(returning?'مرحباً بعودتك':'مرحباً بك')+(user.name?'، '+user.name.split(' ')[0]:'');
-     sub.textContent='سعداء بوجودك معانا — كمل تسوقك بسهولة';
-     localStorage.setItem(key,'1');
-   }else{
-     title.textContent='مرحباً بك في MR Store';
-     sub.textContent='اكتشف أحدث المنتجات وتسوق بسهولة';
-   }
- }
- function view(v){
-   document.body.classList.remove('mr-home-view','mr-products-view','mr-reviews-view','mr-cart-view');
-   if(v!=='cart'){
-     const cartPage=$('#cartDrawer');if(cartPage)cartPage.classList.remove('open');
-     const cartShade=$('#cartOverlay');if(cartShade)cartShade.classList.remove('open');
-   }
-   const welcome=$('#mrWelcomeStrip');
-   if(v==='home'){
-     document.body.classList.add('mr-home-view');setActive(v);
-     if(welcome)welcome.style.display='';
-     window.scrollTo(0,0);
-   }else if(v==='products'){
-     document.body.classList.add('mr-products-view');setActive(v);
-     if(welcome)welcome.style.display='none';
-     const products=$('#products');if(products)products.scrollIntoView({block:'start'});
-   }else if(v==='cart'){
-     if(welcome)welcome.style.display='none';setActive(v);
-     if(typeof openCart==='function')openCart();
-   }else if(v==='orders'){
-     if(welcome)welcome.style.display='none';setActive(v);
-     if(typeof openMyOrdersModal==='function')openMyOrdersModal();
-   }else if(v==='reviews'){
-     document.body.classList.add('mr-reviews-view');setActive(v);
-     if(welcome)welcome.style.display='none';window.scrollTo(0,0);
-   }else if(v==='profile'){
-     if(welcome)welcome.style.display='none';setActive(v);
-     if(typeof getUserData==='function'&&!getUserData()){if(typeof openUserAuthModal==='function')openUserAuthModal();return}
-     if(typeof openSettingsModal==='function')openSettingsModal();
-   }
- }
- document.addEventListener('DOMContentLoaded',()=>{
-   document.querySelectorAll('.mr-bottom-nav button').forEach(b=>b.addEventListener('click',()=>view(b.dataset.mrView)));
-   const cartBtn=$('#cartToggle');
-   if(cartBtn)cartBtn.addEventListener('click',e=>{e.stopImmediatePropagation();view('cart')},true);
-   const profile=$('#userProfileWrap');
-   if(profile)profile.style.display='none';
-   setGreeting();
-   const original=window.updateUserUI;
-   if(typeof original==='function'){
-     window.updateUserUI=function(){original();setGreeting()};
-   }
-   document.querySelectorAll('.main-nav a[href="#top"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();view('home')}));
-   document.querySelectorAll('.main-nav a[href="#products"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();view('products')}));
-   // Remove old hamburger/menu entry points
-   const menu=$('#menuOpenBtn');if(menu)menu.remove();
- });
- window.mrStoreView=view;
+  const pageClasses=['mr-home-view','mr-products-view','mr-favorites-view','mr-reviews-view','mr-cart-view','mr-orders-view','mr-settings-view'];
+  window._mrCurrentView='home';
+  window._mrViewGeneration=0;
+
+  function setActive(view){
+    document.querySelectorAll('.mr-bottom-nav [data-mr-view]').forEach(button=>button.classList.toggle('active',button.dataset.mrView===view));
+  }
+  function closePageLayers(){
+    if(typeof closeCart==='function') closeCart(true);
+    if(typeof closeMyOrdersModal==='function') closeMyOrdersModal(true);
+    if(typeof closeSettingsModal==='function') closeSettingsModal(true);
+    if(typeof closeCheckout==='function') closeCheckout();
+    if(typeof closeUserAuthModal==='function') closeUserAuthModal();
+    if(typeof closeProductDetail==='function' && document.getElementById('productDetailModal')?.classList.contains('open')) closeProductDetail();
+    pageClasses.forEach(name=>document.body.classList.remove(name));
+  }
+  window.mrStoreView=function(view){
+    const allowed=['home','favorites','cart','orders','settings','products'];
+    if(!allowed.includes(view)) view='home';
+    window._mrViewGeneration++;
+    window._mrCurrentView=view;
+    closePageLayers();
+    const welcome=document.getElementById('mrWelcomeStrip');
+    if(welcome) welcome.style.display=(view==='home')?'':'none';
+    if(view==='home'){
+      document.body.classList.add('mr-home-view');
+      setActive('home');
+      window.scrollTo({top:0,behavior:'auto'});
+      return;
+    }
+    if(view==='products'){
+      document.body.classList.add('mr-products-view');
+      setActive('');
+      document.getElementById('products')?.scrollIntoView({block:'start',behavior:'auto'});
+      return;
+    }
+    if(view==='favorites'){
+      document.body.classList.add('mr-favorites-view');
+      setActive('favorites');
+      document.getElementById('products')?.scrollIntoView({block:'start',behavior:'auto'});
+      document.querySelector('.filter-tab[data-badge="favorites"]')?.click();
+      return;
+    }
+    if(view==='cart'){
+      if(welcome) welcome.style.display='none';
+      setActive('cart');
+      openCart(true);
+      return;
+    }
+    if(view==='orders'){
+      if(welcome) welcome.style.display='none';
+      setActive('');
+      openMyOrdersModal(true);
+      return;
+    }
+    if(view==='settings'){
+      if(welcome) welcome.style.display='none';
+      setActive('settings');
+      if(!getUserData?.()){
+        document.body.classList.add('mr-home-view');
+        openUserAuthModal();
+        return;
+      }
+      openSettingsModal(true);
+    }
+  };
+
+  // Keep language switching in sync with the single navigation bar.
+  const languageSelect=document.getElementById('mrLanguageSelect');
+  const storedLanguage=localStorage.getItem('mrstore_language')||'ar';
+  function applyLanguage(language){
+    const english=language==='en';
+    document.documentElement.lang=english?'en':'ar';
+    document.documentElement.dir=english?'ltr':'rtl';
+    document.querySelectorAll('.mr-bottom-nav [data-ar][data-en]').forEach(label=>label.textContent=label.dataset[english?'en':'ar']);
+    const labels={
+      mrLangHeading:english?'App language':'لغة التطبيق',
+      mrLangHint:english?'Your choice is saved on this device.':'يتم حفظ اختيارك على هذا الجهاز.',
+      mrAppearanceHeading:english?'Appearance':'المظهر',
+      mrThemeButton:english?'Toggle dark mode':'تبديل الوضع الليلي'
+    };
+    Object.entries(labels).forEach(([id,value])=>{const element=document.getElementById(id);if(element)element.textContent=value});
+    localStorage.setItem('mrstore_language',language);
+  }
+  if(languageSelect){languageSelect.value=storedLanguage;applyLanguage(storedLanguage);languageSelect.addEventListener('change',()=>applyLanguage(languageSelect.value));}
+
+  document.querySelectorAll('.mr-bottom-nav [data-mr-view]').forEach(button=>button.addEventListener('click',()=>window.mrStoreView(button.dataset.mrView)));
+  document.addEventListener('DOMContentLoaded',()=>{
+    document.body.classList.add('mr-home-view');
+    if(typeof renderCart==='function') renderCart();
+  });
+  window.mrNavigate=window.mrStoreView;
 })();
 </script>
 
