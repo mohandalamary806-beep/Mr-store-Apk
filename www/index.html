@@ -2513,6 +2513,8 @@ body::before{display:none!important}
 .mr-welcome-card strong{display:block;font-size:1.05rem;color:var(--ink)}
 .mr-welcome-card small{color:var(--ink-soft);font-size:.78rem}
 .mr-welcome-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:var(--canvas-deep);color:var(--denim);font-size:1.3rem;flex-shrink:0}
+.mr-welcome-icon img{width:100%;height:100%;display:block;object-fit:cover;transform:scale(1.06)}
+.mr-welcome-icon{overflow:hidden;border-radius:12px}
 .mr-welcome-left{display:flex;align-items:center;gap:12px}
 .mr-bottom-nav{position:fixed;z-index:150;bottom:0;left:0;right:0;min-height:var(--mr-nav-h);padding:7px 8px calc(7px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:rgba(250,252,255,.97);border-top:1px solid rgba(110,130,190,.18);box-shadow:0 -5px 18px rgba(20,35,80,.07)}
 [data-theme="dark"] .mr-bottom-nav{background:rgba(12,19,35,.98);border-color:var(--line)}
@@ -2695,7 +2697,7 @@ body.mr-cart-view #cartDrawer .drawer-foot{flex:0 0 auto}
 
 <div class="mr-welcome-strip" id="mrWelcomeStrip">
  <div class="mr-welcome-card">
-  <div class="mr-welcome-left"><div class="mr-welcome-icon">✦</div><div><strong id="mrWelcomeTitle">مرحباً بك في MR Store</strong><small id="mrWelcomeSub">اكتشف أحدث المنتجات وتسوق بسهولة</small></div></div>
+  <div class="mr-welcome-left"><div class="mr-welcome-icon"><img src="mr-store-logo.png" alt="MR Store"></div><div><strong id="mrWelcomeTitle">مرحباً بك في MR Store</strong><small id="mrWelcomeSub">اكتشف أحدث المنتجات وتسوق بسهولة</small></div></div>
   <span style="color:var(--denim);font-weight:800">MR</span>
  </div>
 </div>
