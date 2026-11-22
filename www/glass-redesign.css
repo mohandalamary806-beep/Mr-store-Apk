@@ -445,13 +445,43 @@ input:focus, textarea:focus, select:focus {
 }
 .settings-divider { border-color: var(--line) !important; }
 .mr-support-link { color: #159b78 !important; }
+/* Toast / notification messages — always light text on a dark navy card,
+   so the message is readable in BOTH light and dark mode. */
 .toast {
-  border: 1px solid var(--mr-glass-line) !important;
+  font-family: 'Tajawal', 'Cairo', system-ui, -apple-system, 'Segoe UI', sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  line-height: 1.55 !important;
+  letter-spacing: 0 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0,0,0,.35);
+  background: linear-gradient(135deg, rgba(14,24,58,.97), rgba(34,48,108,.97)) !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
   border-radius: 16px !important;
-  background: rgba(20,34,64,.88) !important;
+  padding: 12px 18px !important;
   -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
-  box-shadow: var(--shadow-m) !important;
+  box-shadow: 0 16px 44px rgba(6,10,30,.50), inset 0 1px 0 rgba(255,255,255,.10) !important;
+  /* sit above the bottom navigation bar instead of behind/over it */
+  bottom: calc(var(--mr-nav-h, 4px) + env(safe-area-inset-bottom, 0px) + 16px) !important;
+}
+.toast .toast-msg,
+.toast .toast-msg * { color: #ffffff !important; -webkit-text-fill-color: #ffffff; }
+.toast .toast-icon {
+  width: 26px; height: 26px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: .85rem !important; font-weight: 800; line-height: 1;
+  color: #ffffff !important; background: rgba(255,255,255,.16);
+}
+.toast.toast-ok   { border-color: rgba(70,224,170,.55) !important; }
+.toast.toast-err  { border-color: rgba(255,120,150,.60) !important; }
+.toast.toast-info { border-color: rgba(145,160,255,.60) !important; }
+.toast.toast-ok   .toast-icon { background: #1fb985; }
+.toast.toast-err  .toast-icon { background: #e5546f; }
+.toast.toast-info .toast-icon { background: #6475ed; }
+@media (max-width: 480px) {
+  .toast { justify-content: center; font-size: .95rem !important; }
 }
 
 /* Admin login and dashboard — layout and controls preserved */
