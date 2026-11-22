@@ -2583,7 +2583,7 @@ body.mr-cart-view #cartDrawer .drawer-foot{flex:0 0 auto}
 
 /* Keep dialogs and their action buttons in the usable area above the dock. */
 .overlay{z-index:145!important;bottom:var(--mr-nav-clearance)!important}
-.modal:not(#settingsModal):not(#myOrdersModal):not(#editProductModal):not(#editBannerModal):not(#checkoutModal){
+.modal:not(#settingsModal):not(#myOrdersModal):not(#editProductModal):not(#editBannerModal):not(#checkoutModal):not(#addProductModal){
   z-index:147!important;top:calc((100dvh - var(--mr-nav-clearance))/2)!important;
   max-height:calc(100dvh - var(--mr-nav-clearance) - 20px)!important;
 }
@@ -7195,7 +7195,7 @@ function _setupGoogleButtons() {
   /* Pin the three editing/checkout sheets to the full usable viewport.
      Use inset instead of centering so older .modal transforms cannot move them. */
   :root{--mr-nav-clearance:calc(var(--mr-nav-h,72px) + env(safe-area-inset-bottom, 0px))}
-  #editProductModal.modal,#editBannerModal.modal,#checkoutModal.modal{
+  #addProductModal.modal,#editProductModal.modal,#editBannerModal.modal,#checkoutModal.modal{
     position:fixed!important;
     inset:0 0 var(--mr-nav-clearance,72px) 0!important;
     top:0!important;right:0!important;bottom:var(--mr-nav-clearance,72px)!important;left:0!important;
@@ -7212,19 +7212,19 @@ function _setupGoogleButtons() {
     opacity:0!important;visibility:hidden!important;pointer-events:none!important;
     transition:opacity .18s ease,visibility .18s ease!important;
   }
-  #editProductModal.modal.open,#editBannerModal.modal.open,#checkoutModal.modal.open{
+  #addProductModal.modal.open,#editProductModal.modal.open,#editBannerModal.modal.open,#checkoutModal.modal.open{
     top:0!important;bottom:var(--mr-nav-clearance,72px)!important;
     height:auto!important;transform:none!important;translate:none!important;
     opacity:1!important;visibility:visible!important;pointer-events:auto!important;
   }
-  #editProductModal .modal-head,#editBannerModal .modal-head,#checkoutModal .modal-head{
+  #addProductModal .modal-head,#editProductModal .modal-head,#editBannerModal .modal-head,#checkoutModal .modal-head{
     position:relative!important;top:auto!important;flex:0 0 auto!important;width:100%!important;
     padding:14px 18px!important;
     background:var(--paper)!important;background-color:var(--paper)!important;
     border:0!important;border-bottom:1px solid var(--line)!important;
     border-radius:0!important;box-shadow:none!important;
   }
-  #editProductModal .modal-body,#editBannerModal .modal-body,#checkoutModal .modal-body{
+  #addProductModal .modal-body,#editProductModal .modal-body,#editBannerModal .modal-body,#checkoutModal .modal-body{
     display:block!important;flex:1 1 0!important;width:100%!important;
     min-height:0!important;height:auto!important;max-height:none!important;
     overflow-y:auto!important;overflow-x:hidden!important;
@@ -7234,13 +7234,13 @@ function _setupGoogleButtons() {
     -webkit-overflow-scrolling:touch;
     filter:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;
   }
-  #editProductModal .modal-body form,#editBannerModal .modal-body form,#checkoutModal .modal-body form{
+  #addProductModal .modal-body form,#editProductModal .modal-body form,#editBannerModal .modal-body form,#checkoutModal .modal-body form{
     display:block!important;width:100%!important;max-width:100%!important;margin:0 auto!important;
   }
   @media(min-width:760px){
     :root{--mr-nav-clearance:90px}
-    #editProductModal .modal-body,#editBannerModal .modal-body,#checkoutModal .modal-body{padding:22px 28px 28px!important}
-    #editProductModal .modal-body form,#editBannerModal .modal-body form,#checkoutModal .modal-body form{max-width:900px!important}
+    #addProductModal .modal-body,#editProductModal .modal-body,#editBannerModal .modal-body,#checkoutModal .modal-body{padding:22px 28px 28px!important}
+    #addProductModal .modal-body form,#editProductModal .modal-body form,#editBannerModal .modal-body form,#checkoutModal .modal-body form{max-width:900px!important}
   }
 </style>
 
@@ -7260,6 +7260,7 @@ function _setupGoogleButtons() {
     if(typeof closeCheckout==='function') closeCheckout();
     if(typeof closeEditProductModal==='function' && document.getElementById('editProductModal')?.classList.contains('open')) closeEditProductModal();
     if(typeof closeEditBannerModal==='function' && document.getElementById('editBannerModal')?.classList.contains('open')) closeEditBannerModal();
+    if(typeof closeAddProductModal==='function' && document.getElementById('addProductModal')?.classList.contains('open')) closeAddProductModal();
     if(typeof closeUserAuthModal==='function') closeUserAuthModal();
     if(typeof closeProductDetail==='function' && document.getElementById('productDetailModal')?.classList.contains('open')) closeProductDetail();
     pageClasses.forEach(name=>document.body.classList.remove(name));
