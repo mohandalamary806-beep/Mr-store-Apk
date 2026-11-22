@@ -466,6 +466,10 @@ input:focus, textarea:focus, select:focus {
   /* sit above the bottom navigation bar instead of behind/over it */
   bottom: calc(var(--mr-nav-h, 4px) + env(safe-area-inset-bottom, 0px) + 16px) !important;
 }
+/* The toast is only a message: it must NEVER catch taps (even while hidden),
+   otherwise it blocks the bottom navigation buttons underneath it. */
+.toast, .toast * { pointer-events: none !important; }
+.toast:not(.show) { visibility: hidden; }
 .toast .toast-msg,
 .toast .toast-msg * { color: #ffffff !important; -webkit-text-fill-color: #ffffff; }
 .toast .toast-icon {
