@@ -2002,10 +2002,8 @@ body { animation: pageFadeIn .4s ease both; }
 /* ============ RECENTLY VIEWED SECTION ============ */
 .rv-section{padding-block:48px;background:var(--canvas-deep);border-top:2px dashed var(--line);}
 [data-theme="dark"] .rv-section{background:var(--paper);border-color:#1E2130;}
-.rv-scroll-wrap{overflow-x:auto;padding-bottom:12px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;}
-.rv-scroll-wrap::-webkit-scrollbar{height:5px;}
-.rv-scroll-wrap::-webkit-scrollbar-track{background:var(--line);border-radius:4px;}
-.rv-scroll-wrap::-webkit-scrollbar-thumb{background:var(--denim);border-radius:4px;}
+.rv-scroll-wrap{overflow-x:auto;padding-bottom:12px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.rv-scroll-wrap::-webkit-scrollbar{display:none;width:0;height:0;}
 .rv-cards{display:flex;gap:16px;width:max-content;padding-bottom:4px;}
 .rv-card{width:160px;flex-shrink:0;background:var(--paper);border:1.5px solid var(--line);border-radius:var(--radius-m);overflow:hidden;cursor:pointer;transition:transform .28s cubic-bezier(.34,1.56,.64,1),box-shadow .25s ease,border-color .25s ease;}
 .rv-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:var(--shadow-m);border-color:var(--denim);}
@@ -2331,13 +2329,22 @@ body { animation: pageFadeIn .4s ease both; }
 
 /* --- Smooth scrollbar --- */
 html { scroll-behavior: smooth; }
-::-webkit-scrollbar { width:7px; height:7px; }
-::-webkit-scrollbar-track { background: var(--canvas-deep); }
-::-webkit-scrollbar-thumb { background: var(--line); border-radius:4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--denim); }
-[data-theme="dark"] ::-webkit-scrollbar-track { background: #080A0E; }
-[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #1E2130; }
-[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #D4A843; }
+/* Hide every scrollbar (page + inner scrollers); scrolling itself still works */
+html, body, * { scrollbar-width: none; -ms-overflow-style: none; }
+::-webkit-scrollbar { display:none; width:0; height:0; background:transparent; }
+
+/* Smoothness: while the user is scrolling, freeze the always-running decorative
+   animations so the browser only has to paint the scroll itself. They resume right after. */
+html.mr-scrolling .skeleton,
+html.mr-scrolling .sync-dot,
+html.mr-scrolling .hero-title,
+html.mr-scrolling .hero-stamp,
+html.mr-scrolling .hero-actions .btn-primary::before,
+html.mr-scrolling #checkoutBtn:not(:disabled)::after,
+html.mr-scrolling .wa-float,
+html.mr-scrolling .timeline-dot.active,
+html.mr-scrolling .av-frame-owner,
+html.mr-scrolling .loading-logo { animation-play-state: paused !important; }
 
 /* --- Focus-visible glow ring --- */
 :focus-visible {
@@ -5872,7 +5879,7 @@ function openProductDetail(productId) {
   const thumbsEl = document.getElementById('pdThumbs');
   thumbsEl.innerHTML = allImages.map((src, i) => `
     <div class="pd-thumb ${i===0?'active':''}" onclick="pdSwitchImage('${src}', this)">
-      <img src="${src}" alt="${p.name}" loading="lazy">
+      <img src="${src}" alt="${p.name}" loading="lazy" decoding="async">
     </div>`).join('');
 
   /* Badge */
@@ -6175,6 +6182,16 @@ window.addEventListener('scroll', () => {
   const hdr = document.querySelector('.site-header');
   if (hdr) hdr.classList.toggle('scrolled', window.scrollY > 30);
 }, { passive: true });
+
+/* Pause decorative animations while scrolling (any scroll container) for smoother scrolling */
+(function(){
+  var root=document.documentElement, timer=null, on=false;
+  function stop(){ on=false; root.classList.remove('mr-scrolling'); }
+  document.addEventListener('scroll', function(){
+    if(!on){ on=true; root.classList.add('mr-scrolling'); }
+    clearTimeout(timer); timer=setTimeout(stop,150);
+  }, { capture:true, passive:true });
+})();
 
 /* ============ SWIPE TO BROWSE (mobile) ============ */
 (function() {
@@ -7006,7 +7023,7 @@ function renderRecentlyViewed() {
       if (!p) return '';
       return `
       <div class="rv-card" onclick="openProductDetail(${p.id})" title="${p.name}">
-        <img class="rv-card-img" src="${p.img}" alt="${p.name}" loading="lazy">
+        <img class="rv-card-img" src="${p.img}" alt="${p.name}" loading="lazy" decoding="async">
         <div class="rv-card-info">
           <div class="rv-card-name">${p.name}</div>
           <div class="rv-card-price">${money(p.price)}</div>
@@ -7048,7 +7065,7 @@ window.mrStartGoogleLogin = async function(){
     throw new Error('Google Sign-In is unavailable');
   }catch(err){
     console.error('MR Store Google login:',err);
-    if(typeof showToast==='function') showToast('تعذر تسجيل الدخول بجوجل. تأكد من إعداد OAuth للتطبيق.');
+    if(typeof showToast==='function') showToast('تحقق من اتصالك بالإنترنت أو أعد تشغيل التطبيق.');
   }finally{if(btn){btn.disabled=false;btn.classList.remove('is-loading');}}
 };
 

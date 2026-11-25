@@ -399,6 +399,11 @@ button:not(.login-google-glass){box-shadow:0 4px 16px rgba(15,25,45,.07)}
 </style>
 <link rel="stylesheet" href="glass-redesign.css">
 <script src="no-copy.js"></script>
+<style>
+/* Hide every scrollbar; scrolling itself still works */
+html, body, * { scrollbar-width: none; -ms-overflow-style: none; }
+::-webkit-scrollbar { display:none; width:0; height:0; background:transparent; }
+</style>
 </head>
 <body>
 
@@ -723,7 +728,7 @@ window.mrLoginWithGoogle=async function(){
     }
     if(window.google?.accounts?.id){google.accounts.id.prompt();return;}
     showMsg('loginErr','تسجيل الدخول بجوجل غير متاح حالياً.');
-  }catch(err){console.error('Google login failed:',err);showMsg('loginErr','تعذر تسجيل الدخول بجوجل. تأكد من إعداد OAuth للتطبيق.');}
+  }catch(err){console.error('Google login failed:',err);showMsg('loginErr','تحقق من اتصالك بالإنترنت أو أعد تشغيل التطبيق.');}
 };
 function handleCredentialResponse(response){
   try{
